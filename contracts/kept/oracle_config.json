@@ -1,0 +1,45 @@
+{
+  "oracle": {
+    "admin_url": "http://localhost:8001",
+    "oracle_did": "did:indy:testnet:oracle#key-1",
+    "oracle_address": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
+    "oracle_private_key": "0x1111111111111111111111111111111111111111111111111111111111111111",
+    "description": "跨链Oracle服务配置"
+  },
+  "chains": [
+    {
+      "name": "Besu Chain A",
+      "rpc_url": "http://localhost:8545",
+      "chain_id": "chain_a",
+      "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+      "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+      "description": "第一条Besu链，支持锁定和解锁"
+    },
+    {
+      "name": "Besu Chain B",
+      "rpc_url": "http://localhost:8555",
+      "chain_id": "chain_b",
+      "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+      "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+      "description": "第二条Besu链，支持锁定和解锁"
+    }
+  ],
+  "bridge": {
+    "proof_validity_period": 86400,
+    "max_supported_chains": 10,
+    "monitor_interval": 5,
+    "description": "跨链桥配置参数"
+  },
+  "acapy": {
+    "admin_url": "http://localhost:8001",
+    "holder_url": "http://localhost:8001",
+    "issuer_url": "http://localhost:8000",
+    "description": "ACA-Py服务配置"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "oracle.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨链VC系统监控面板 - 增强版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-online { background-color: #27ae60; }
+        .status-offline { background-color: #e74c3c; }
+        .status-error { background-color: #f39c12; }
+        .status-unknown { background-color: #95a5a6; }
+
+        .status-text {
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-online .status-text { color: #27ae60; }
+        .status-offline .status-text { color: #e74c3c; }
+        .status-error .status-text { color: #f39c12; }
+        .status-unknown .status-text { color: #95a5a6; }
+
+        .card-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+        }
+
+        .transfer-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .transfer-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .transfer-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-input, .form-select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .transfer-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            grid-column: 1 / -1;
+            justify-self: center;
+            width: 200px;
+        }
+
+        .transfer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .transfer-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .transfer-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .transfer-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .transfer-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .history-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .history-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .history-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .history-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status-success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-failed {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .tx-hash {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #667eea;
+            cursor: pointer;
+        }
+
+        .tx-hash:hover {
+            text-decoration: underline;
+        }
+
+        .logs-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .logs-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .logs-content {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #95a5a6;
+        }
+
+        .log-level-info { color: #3498db; }
+        .log-level-success { color: #27ae60; }
+        .log-level-warning { color: #f39c12; }
+        .log-level-error { color: #e74c3c; }
+
+        .refresh-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .refresh-button:hover {
+            background: #2980b9;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .transfer-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .history-table {
+                font-size: 0.8em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 跨链VC系统监控面板 - 增强版</h1>
+            <p>实时监控Besu链、Oracle服务、ACA-Py和智能合约状态，支持真实跨链转账</p>
+            <div style="margin-top: 20px;">
+                <a href="/vc-data" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">查看VC数据与合约变量</a>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Besu Chain A -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔗 Besu Chain A</div>
+                    <div class="status-indicator status-unknown" id="besu-a-status"></div>
+                </div>
+                <div class="card-content" id="besu-a-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="besu-a-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">链ID:</span>
+                        <span class="info-value" id="besu-a-chain-id">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">最新区块:</span>
+                        <span class="info-value" id="besu-a-block">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gas价格:</span>
+                        <span class="info-value" id="besu-a-gas">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">测试账户余额:</span>
+                        <span class="info-value" id="besu-a-balance">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">测试账户地址:</span>
+                        <span class="info-value" id="besu-a-address">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nonce:</span>
+                        <span class="info-value" id="besu-a-nonce">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Besu Chain B -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔗 Besu Chain B</div>
+                    <div class="status-indicator status-unknown" id="besu-b-status"></div>
+                </div>
+                <div class="card-content" id="besu-b-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="besu-b-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">链ID:</span>
+                        <span class="info-value" id="besu-b-chain-id">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">最新区块:</span>
+                        <span class="info-value" id="besu-b-block">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gas价格:</span>
+                        <span class="info-value" id="besu-b-gas">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">测试账户余额:</span>
+                        <span class="info-value" id="besu-b-balance">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">测试账户地址:</span>
+                        <span class="info-value" id="besu-b-address">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nonce:</span>
+                        <span class="info-value" id="besu-b-nonce">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oracle Service -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔮 Oracle服务</div>
+                    <div class="status-indicator status-unknown" id="oracle-status"></div>
+                </div>
+                <div class="card-content" id="oracle-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="oracle-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">URL:</span>
+                        <span class="info-value" id="oracle-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">消息:</span>
+                        <span class="info-value" id="oracle-message">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACA-Py Issuer -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📜 ACA-Py发行者</div>
+                    <div class="status-indicator status-unknown" id="acapy-issuer-status"></div>
+                </div>
+                <div class="card-content" id="acapy-issuer-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="acapy-issuer-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">管理URL:</span>
+                        <span class="info-value" id="acapy-issuer-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">消息:</span>
+                        <span class="info-value" id="acapy-issuer-message">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACA-Py Holder -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">👤 ACA-Py持有者</div>
+                    <div class="status-indicator status-unknown" id="acapy-holder-status"></div>
+                </div>
+                <div class="card-content" id="acapy-holder-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="acapy-holder-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">管理URL:</span>
+                        <span class="info-value" id="acapy-holder-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">消息:</span>
+                        <span class="info-value" id="acapy-holder-message">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VC Status -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎫 VC状态</div>
+                    <div class="status-indicator status-unknown" id="vc-status"></div>
+                </div>
+                <div class="card-content" id="vc-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="vc-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Schema注册:</span>
+                        <span class="info-value" id="vc-schema">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">凭证定义:</span>
+                        <span class="info-value" id="vc-cred-def">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">VC颁发:</span>
+                        <span class="info-value" id="vc-issued">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Contracts -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 智能合约</div>
+                    <div class="status-indicator status-unknown" id="contracts-status"></div>
+                </div>
+                <div class="card-content" id="contracts-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="contracts-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">桥接合约:</span>
+                        <span class="info-value" id="contracts-bridge">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">验证合约:</span>
+                        <span class="info-value" id="contracts-verifier">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">代币合约:</span>
+                        <span class="info-value" id="contracts-token">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 跨链转账区域 -->
+        <div class="transfer-section">
+            <div class="transfer-title">💸 跨链转账操作</div>
+            <form class="transfer-form" id="transferForm">
+                <div class="form-group">
+                    <label class="form-label" for="amount">转账金额 (ETH)</label>
+                    <input type="number" id="amount" name="amount" class="form-input" step="0.001" min="0" placeholder="0.001" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="fromChain">源链</label>
+                    <select id="fromChain" name="fromChain" class="form-select" required>
+                        <option value="chain_a">Besu Chain A</option>
+                        <option value="chain_b">Besu Chain B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="toChain">目标链</label>
+                    <select id="toChain" name="toChain" class="form-select" required>
+                        <option value="chain_b">Besu Chain B</option>
+                        <option value="chain_a">Besu Chain A</option>
+                    </select>
+                </div>
+                <button type="submit" class="transfer-button" id="transferButton">
+                    执行跨链转账
+                </button>
+            </form>
+            <div class="transfer-result" id="transferResult"></div>
+        </div>
+
+        <!-- 转账历史区域 -->
+        <div class="history-section">
+            <div class="history-title">
+                转账历史
+                <button class="refresh-button" onclick="refreshHistory()">刷新历史</button>
+            </div>
+            <table class="history-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>时间</th>
+                        <th>金额 (ETH)</th>
+                        <th>源链</th>
+                        <th>目标链</th>
+                        <th>锁定交易</th>
+                        <th>释放交易</th>
+                        <th>源链变化</th>
+                        <th>目标链变化</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="10" class="empty-state">暂无转账记录</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 日志区域 -->
+        <div class="logs-section">
+            <div class="logs-title">
+                系统日志
+                <button class="refresh-button" onclick="refreshStatus()">刷新状态</button>
+            </div>
+            <div class="logs-content" id="logsContent">
+                <div class="log-entry">
+                    <span class="log-timestamp">[2025-01-12 12:00:00]</span>
+                    <span class="log-level-info">[INFO]</span>
+                    系统启动中...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket连接
+        const socket = io();
+        
+        // 状态更新处理
+        socket.on('status_update', function(data) {
+            updateDashboard(data);
+        });
+
+        // 更新仪表板
+        function updateDashboard(status) {
+            // 更新Besu Chain A
+            updateServiceStatus('besu-a', status.besu_chain_a);
+            
+            // 更新Besu Chain B
+            updateServiceStatus('besu-b', status.besu_chain_b);
+            
+            // 更新Oracle服务
+            updateServiceStatus('oracle', status.oracle_service);
+            
+            // 更新ACA-Py发行者
+            updateServiceStatus('acapy-issuer', status.acapy_issuer);
+            
+            // 更新ACA-Py持有者
+            updateServiceStatus('acapy-holder', status.acapy_holder);
+            
+            // 更新VC状态
+            updateServiceStatus('vc', status.vc_status);
+            
+            // 更新智能合约
+            updateServiceStatus('contracts', status.contracts);
+            
+            // 添加日志
+            addLog('info', '系统状态已更新');
+        }
+
+        // 更新服务状态
+        function updateServiceStatus(prefix, serviceStatus) {
+            const statusElement = document.getElementById(`${prefix}-status`);
+            const statusTextElement = document.getElementById(`${prefix}-status-text`);
+            
+            if (serviceStatus) {
+                // 更新状态指示器
+                statusElement.className = `status-indicator status-${serviceStatus.status}`;
+                statusTextElement.textContent = serviceStatus.status.toUpperCase();
+                statusTextElement.className = `info-value status-text status-${serviceStatus.status}`;
+                
+                // 更新详细信息
+                if (serviceStatus.details) {
+                    const details = serviceStatus.details;
+                    
+                    // 根据服务类型更新不同的字段
+                    if (prefix.startsWith('besu-')) {
+                        updateElement(`${prefix}-chain-id`, details.chain_id || '-');
+                        updateElement(`${prefix}-block`, details.latest_block || '-');
+                        updateElement(`${prefix}-gas`, details.gas_price || '-');
+                        updateElement(`${prefix}-balance`, details.test_account_balance ? `${details.test_account_balance} ETH` : '-');
+                        updateElement(`${prefix}-address`, details.test_account_address || '-');
+                        updateElement(`${prefix}-nonce`, details.test_account_nonce || '-');
+                    } else if (prefix === 'oracle') {
+                        updateElement(`${prefix}-url`, details.url || '-');
+                        updateElement(`${prefix}-message`, details.message || '-');
+                    } else if (prefix.startsWith('acapy-')) {
+                        updateElement(`${prefix}-url`, details.admin_url || '-');
+                        updateElement(`${prefix}-message`, details.message || '-');
+                    } else if (prefix === 'vc') {
+                        updateElement(`${prefix}-schema`, details.schema_registered ? '✅ 已注册' : '❌ 未注册');
+                        updateElement(`${prefix}-cred-def`, details.cred_def_created ? '✅ 已创建' : '❌ 未创建');
+                        updateElement(`${prefix}-issued`, details.vc_issued ? '✅ 已颁发' : '❌ 未颁发');
+                    } else if (prefix === 'contracts') {
+                        updateElement(`${prefix}-bridge`, details.bridge_contract || '-');
+                        updateElement(`${prefix}-verifier`, details.verifier_contract || '-');
+                        updateElement(`${prefix}-token`, details.token_contract || '-');
+                    }
+                }
+            }
+        }
+
+        // 更新元素内容
+        function updateElement(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        // 添加日志
+        function addLog(level, message) {
+            const logsContent = document.getElementById('logsContent');
+            const timestamp = new Date().toLocaleString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level-${level}">[${level.toUpperCase()}]</span>
+                ${message}
+            `;
+            logsContent.appendChild(logEntry);
+            logsContent.scrollTop = logsContent.scrollHeight;
+        }
+
+        // 刷新状态
+        function refreshStatus() {
+            addLog('info', '手动刷新系统状态...');
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateDashboard(data);
+                    addLog('success', '系统状态刷新完成');
+                })
+                .catch(error => {
+                    addLog('error', `刷新失败: ${error.message}`);
+                });
+        }
+
+        // 刷新转账历史
+        function refreshHistory() {
+            addLog('info', '刷新转账历史...');
+            fetch('/api/transfer-history')
+                .then(response => response.json())
+                .then(data => {
+                    updateHistoryTable(data);
+                    addLog('success', '转账历史刷新完成');
+                })
+                .catch(error => {
+                    addLog('error', `刷新历史失败: ${error.message}`);
+                });
+        }
+
+        // 更新转账历史表格
+        function updateHistoryTable(history) {
+            const tbody = document.getElementById('historyTableBody');
+            
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">暂无转账记录</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = history.map(record => `
+                <tr>
+                    <td>${record.id}</td>
+                    <td>${new Date(record.timestamp).toLocaleString()}</td>
+                    <td>${record.amount}</td>
+                    <td>${record.from_chain}</td>
+                    <td>${record.to_chain}</td>
+                    <td class="tx-hash" title="点击复制">${record.lock_tx_hash || '-'}</td>
+                    <td class="tx-hash" title="点击复制">${record.release_tx_hash || '-'}</td>
+                    <td>${record.source_change ? record.source_change + ' ETH' : '-'}</td>
+                    <td>${record.target_change ? record.target_change + ' ETH' : '-'}</td>
+                    <td class="status-${record.status}">${record.status === 'success' ? '成功' : '失败'}</td>
+                </tr>
+            `).join('');
+            
+            // 添加点击复制功能
+            document.querySelectorAll('.tx-hash').forEach(element => {
+                element.addEventListener('click', function() {
+                    navigator.clipboard.writeText(this.textContent);
+                    addLog('info', `已复制交易哈希: ${this.textContent}`);
+                });
+            });
+        }
+
+        // 转账表单处理
+        document.getElementById('transferForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                amount: parseFloat(formData.get('amount')),
+                from_chain: formData.get('fromChain'),
+                to_chain: formData.get('toChain')
+            };
+            
+            const transferButton = document.getElementById('transferButton');
+            const transferResult = document.getElementById('transferResult');
+            
+            // 禁用按钮
+            transferButton.disabled = true;
+            transferButton.textContent = '转账中...';
+            
+            // 清空之前的结果
+            transferResult.style.display = 'none';
+            
+            addLog('info', `开始跨链转账: ${data.amount} ETH 从 ${data.from_chain} 到 ${data.to_chain}`);
+            
+            // 发送转账请求
+            fetch('/api/transfer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    transferResult.className = 'transfer-result transfer-success';
+                    transferResult.innerHTML = `
+                        <strong>跨链转账成功!</strong><br>
+                        锁定交易: <span class="tx-hash">${result.lock_tx_hash}</span><br>
+                        释放交易: <span class="tx-hash">${result.release_tx_hash}</span><br>
+                        金额: ${result.amount} ETH<br>
+                        从: ${result.from_chain} (${result.from_address})<br>
+                        到: ${result.to_chain} (${result.to_address})<br>
+                        锁定区块: ${result.lock_block_number}<br>
+                        释放区块: ${result.release_block_number}<br>
+                        源链变化: ${result.source_change} ETH<br>
+                        目标链变化: ${result.target_change} ETH<br>
+                        时间: ${new Date(result.timestamp).toLocaleString()}
+                    `;
+                    addLog('success', `跨链转账成功: 锁定${result.lock_tx_hash}, 释放${result.release_tx_hash}`);
+                    
+                    // 刷新转账历史
+                    refreshHistory();
+                } else {
+                    transferResult.className = 'transfer-result transfer-error';
+                    transferResult.innerHTML = `
+                        <strong>转账失败!</strong><br>
+                        错误: ${result.error}
+                    `;
+                    addLog('error', `转账失败: ${result.error}`);
+                }
+                transferResult.style.display = 'block';
+            })
+            .catch(error => {
+                transferResult.className = 'transfer-result transfer-error';
+                transferResult.innerHTML = `
+                    <strong>转账失败!</strong><br>
+                    错误: ${error.message}
+                `;
+                transferResult.style.display = 'block';
+                addLog('error', `转账请求失败: ${error.message}`);
+            })
+            .finally(() => {
+                // 恢复按钮
+                transferButton.disabled = false;
+                transferButton.textContent = '执行跨链转账';
+            });
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('info', '页面加载完成，开始监控系统状态...');
+            refreshStatus();
+            refreshHistory();
+        });
+    </script>
+</body>
+</html>

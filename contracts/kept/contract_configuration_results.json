@@ -1,0 +1,14 @@
+{
+  "chain_a": {
+    "chain_name": "Besu Chain A",
+    "oracle_set": true,
+    "identity_verified": false,
+    "token_supported": false
+  },
+  "chain_b": {
+    "chain_name": "Besu Chain B",
+    "oracle_set": true,
+    "identity_verified": false,
+    "token_supported": false
+  }
+}

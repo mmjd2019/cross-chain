@@ -1,0 +1,76 @@
+{
+  "chain_a": {
+    "chain_name": "Besu Chain A",
+    "rpc_url": "http://localhost:8545",
+    "status": "success",
+    "contracts": {
+      "SimpleTest": {
+        "address": "0xae519fc2ba8e6ffe6473195c092bf1bae986ff90",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "CrossChainDIDVerifier": {
+        "address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "SimpleBridge": {
+        "address": "0x6e05f58eedda592f34dd9105b1827f252c509de0",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "CrossChainBridgeSimple": {
+        "address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "SimpleAssetManager": {
+        "address": "0xed8d61f42dc1e56ae992d333a4992c3796b22a74",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      }
+    }
+  },
+  "chain_b": {
+    "chain_name": "Besu Chain B",
+    "rpc_url": "http://localhost:8555",
+    "status": "success",
+    "contracts": {
+      "SimpleTest": {
+        "address": "0xae519fc2ba8e6ffe6473195c092bf1bae986ff90",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "CrossChainDIDVerifier": {
+        "address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "SimpleBridge": {
+        "address": "0x6e05f58eedda592f34dd9105b1827f252c509de0",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "CrossChainBridgeSimple": {
+        "address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      },
+      "SimpleAssetManager": {
+        "address": "0xed8d61f42dc1e56ae992d333a4992c3796b22a74",
+        "code_exists": true,
+        "balance": 0.0,
+        "status": "success"
+      }
+    }
+  }
+}

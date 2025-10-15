@@ -1,0 +1,36 @@
+{
+  "test_id": "real_transfer_1760239616",
+  "start_time": "2025-10-12T11:26:56.380979",
+  "steps": [
+    {
+      "step_name": "\u68c0\u67e5\u521d\u59cb\u4f59\u989d",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:26:56.624740",
+      "details": {
+        "chain_a_balance_wei": 4951760155506078469596496896,
+        "chain_a_balance_eth": 4951760155.506079,
+        "chain_b_balance_wei": 4951760155506078469596496896,
+        "chain_b_balance_eth": 4951760155.506079
+      }
+    },
+    {
+      "step_name": "\u6ce8\u518cDID",
+      "status": "\u5931\u8d25",
+      "timestamp": "2025-10-12T11:26:56.929356",
+      "details": {
+        "error": "Transaction had invalid fields: {'to': '0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf'}"
+      }
+    },
+    {
+      "step_name": "\u771f\u5b9e\u8f6c\u8d26",
+      "status": "\u5931\u8d25",
+      "timestamp": "2025-10-12T11:26:56.929476",
+      "details": {
+        "error": "DID\u6ce8\u518c\u5931\u8d25"
+      }
+    }
+  ],
+  "transactions": {},
+  "final_status": "failed",
+  "end_time": "2025-10-12T11:26:56.929548"
+}

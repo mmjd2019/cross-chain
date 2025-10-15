@@ -1,0 +1,7 @@
+{
+  "success": true,
+  "issuer_did": "DPvobytTtKvmyeRTJZYjsg",
+  "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:CrossChainLockCredential:1.0",
+  "cred_def_id": "DPvobytTtKvmyeRTJZYjsg:3:CL:11:cross-chain-lock",
+  "error": null
+}

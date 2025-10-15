@@ -1,0 +1,86 @@
+{
+  "test_id": "simple_transfer_1760239761",
+  "start_time": "2025-10-12T11:29:21.848589",
+  "steps": [
+    {
+      "step_name": "\u68c0\u67e5\u521d\u59cb\u4f59\u989d",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:21.964206",
+      "details": {
+        "chain_a_balance_wei": 4951760155506078469596496896,
+        "chain_a_balance_eth": 4951760155.506079,
+        "chain_b_balance_wei": 4951760155506078469596496896,
+        "chain_b_balance_eth": 4951760155.506079
+      }
+    },
+    {
+      "step_name": "\u53d1\u9001\u8f6c\u8d26\u4ea4\u6613",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:22.243122",
+      "details": {
+        "transaction_hash": "0xf9adc8de3fe9cc6fbcb6ee1b8289726595368f0af294b20c32ac9a39470ccd6f",
+        "from": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+        "to": "0x2e988A386a799F506693793c6A5AF6B54dfAaBfB",
+        "amount": 1000000000000000000,
+        "nonce": 85,
+        "gas_price": 0
+      }
+    },
+    {
+      "step_name": "\u8f6c\u8d26\u786e\u8ba4",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:26.594578",
+      "details": {
+        "block_number": 32412,
+        "gas_used": 21000
+      }
+    },
+    {
+      "step_name": "\u68c0\u67e5\u4f59\u989d\u53d8\u5316",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:26.840459",
+      "details": {
+        "sender_balance_wei": 4951760154506078469596496896,
+        "sender_balance_eth": 4951760154.506079,
+        "receiver_balance_wei": 1000000000000000000,
+        "receiver_balance_eth": 1.0,
+        "chain_b_balance_wei": 4951760155506078469596496896,
+        "chain_b_balance_eth": 4951760155.506079
+      }
+    },
+    {
+      "step_name": "\u8ba1\u7b97\u4f59\u989d\u53d8\u5316",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:26.842362",
+      "details": {
+        "initial_balance_a": 4951760155506078469596496896,
+        "final_balance_a": 4951760154506078469596496896,
+        "balance_change_a": 1000000000000000000,
+        "receiver_gained": 1000000000000000000,
+        "transfer_amount": 1000000000000000000
+      }
+    },
+    {
+      "step_name": "\u9a8c\u8bc1\u8f6c\u8d26\u6210\u529f",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:29:26.842681",
+      "details": {
+        "\u53d1\u9001\u8005\u51cf\u5c11": "1.0 ETH",
+        "\u63a5\u6536\u8005\u589e\u52a0": "1.0 ETH",
+        "\u9884\u671f\u8f6c\u8d26": "1.0 ETH",
+        "\u8f6c\u8d26\u72b6\u6001": "\u6210\u529f"
+      }
+    }
+  ],
+  "transactions": {
+    "transfer_tx": {
+      "hash": "0xf9adc8de3fe9cc6fbcb6ee1b8289726595368f0af294b20c32ac9a39470ccd6f",
+      "block_number": 32412,
+      "amount": 1000000000000000000,
+      "from": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "to": "0x2e988A386a799F506693793c6A5AF6B54dfAaBfB"
+    }
+  },
+  "final_status": "success",
+  "end_time": "2025-10-12T11:29:26.842881"
+}

@@ -1,0 +1,76 @@
+{
+  "validation_summary": {
+    "total_contracts": 4,
+    "successful_contracts": 0,
+    "success_rate": "0.0%"
+  },
+  "contract_details": {
+    "CrossChainDIDVerifier": {
+      "success": false,
+      "missing_functions": [
+        "verifyIdentity",
+        "revokeVerification",
+        "recordCrossChainProof",
+        "addSupportedChain",
+        "removeSupportedChain",
+        "setCrossChainOracle"
+      ],
+      "missing_events": [],
+      "missing_modifiers": []
+    },
+    "CrossChainBridge": {
+      "success": false,
+      "missing_functions": [
+        "lockAssets",
+        "unlockAssets",
+        "addSupportedToken",
+        "removeSupportedToken",
+        "emergencyUnlock"
+      ],
+      "missing_events": []
+    },
+    "CrossChainToken": {
+      "success": false,
+      "missing_erc20": [
+        "totalSupply",
+        "balanceOf",
+        "transfer",
+        "allowance",
+        "approve",
+        "transferFrom"
+      ],
+      "missing_crosschain": [
+        "mint",
+        "burn",
+        "crossChainLock",
+        "crossChainUnlock",
+        "setMinter",
+        "setCrossChainBridge"
+      ]
+    },
+    "AssetManager": {
+      "success": false,
+      "missing_basic": [
+        "deposit",
+        "withdraw",
+        "transfer",
+        "depositToken",
+        "withdrawToken",
+        "transferToken"
+      ],
+      "missing_crosschain": [
+        "initiateCrossChainTransfer",
+        "completeCrossChainTransfer",
+        "addSupportedToken",
+        "removeSupportedToken"
+      ],
+      "missing_query": []
+    }
+  },
+  "recommendations": [
+    "部分合约验证未通过，请检查缺失的函数和事件",
+    "建议在部署前进行完整的编译测试",
+    "建议在测试网络上进行功能验证",
+    "建议配置完整的测试环境进行集成测试"
+  ]
+}

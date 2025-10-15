@@ -1,0 +1,83 @@
+{
+  "transfer_info": {
+    "amount_eth": 0.1,
+    "amount_wei": 100000000000000000,
+    "from_chain": "chain_a",
+    "to_chain": "chain_b",
+    "lock_tx_hash": "0x617f73743c5c20dcab24b585018496b21c9f4e22ae484bf74d42941203ace131",
+    "release_tx_hash": "0x7042b356c1bf3eff23a6afd66bc3edcd06d8bed24c6296010787c21ead057894",
+    "lock_block": 35036,
+    "release_block": 34903
+  },
+  "before_status": {
+    "chain_a": {
+      "chain_id": "chain_a",
+      "chain_name": "Besu Chain A",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "account_balance_wei": 4951760152406078469596496896,
+      "account_balance_eth": 4951760152.406078,
+      "bridge_balance_wei": 0,
+      "bridge_balance_eth": 0,
+      "latest_block": 35035,
+      "timestamp": "2025-10-12T18:32:08.614540"
+    },
+    "chain_b": {
+      "chain_id": "chain_b",
+      "chain_name": "Besu Chain B",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "account_balance_wei": 4951760155456078469596496896,
+      "account_balance_eth": 4951760155.456079,
+      "bridge_balance_wei": 0,
+      "bridge_balance_eth": 0,
+      "latest_block": 34901,
+      "timestamp": "2025-10-12T18:32:08.686532"
+    }
+  },
+  "after_status": {
+    "chain_a": {
+      "chain_id": "chain_a",
+      "chain_name": "Besu Chain A",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "account_balance_wei": 4951760152406078469596496896,
+      "account_balance_eth": 4951760152.406078,
+      "bridge_balance_wei": 0,
+      "bridge_balance_eth": 0,
+      "latest_block": 35037,
+      "timestamp": "2025-10-12T18:32:14.478649"
+    },
+    "chain_b": {
+      "chain_id": "chain_b",
+      "chain_name": "Besu Chain B",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "account_balance_wei": 4951760155456078469596496896,
+      "account_balance_eth": 4951760155.456079,
+      "bridge_balance_wei": 0,
+      "bridge_balance_eth": 0,
+      "latest_block": 34903,
+      "timestamp": "2025-10-12T18:32:14.575519"
+    }
+  },
+  "changes": {
+    "chain_a": {
+      "chain_name": "Besu Chain A",
+      "account_before_eth": 4951760152.406078,
+      "account_after_eth": 4951760152.406078,
+      "account_change_eth": 0.0,
+      "bridge_before_eth": 0,
+      "bridge_after_eth": 0,
+      "bridge_change_eth": 0,
+      "account_percentage_change": 0.0
+    },
+    "chain_b": {
+      "chain_name": "Besu Chain B",
+      "account_before_eth": 4951760155.456079,
+      "account_after_eth": 4951760155.456079,
+      "account_change_eth": 0.0,
+      "bridge_before_eth": 0,
+      "bridge_after_eth": 0,
+      "bridge_change_eth": 0,
+      "account_percentage_change": 0.0
+    }
+  },
+  "timestamp": "2025-10-12T18:32:14.578881"
+}

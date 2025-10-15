@@ -1,0 +1,51 @@
+{
+  "verification_info": {
+    "amount_eth": 0.02,
+    "from_chain": "chain_a",
+    "to_chain": "chain_b",
+    "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+    "destroy_tx_hash": "0x34e6ace98113918e0b94aef5d57adfa1f9a2b5083657b4d6a4d4e69d1a366136",
+    "destroy_block": 35780
+  },
+  "before_status": {
+    "chain_a": {
+      "balance_eth": 4951760149.156078,
+      "balance_wei": 4951760149156078469596496896,
+      "nonce": 100
+    },
+    "chain_b": {
+      "balance_eth": 4951760155.256079,
+      "balance_wei": 4951760155256078469596496896,
+      "nonce": 96
+    }
+  },
+  "after_status": {
+    "chain_a": {
+      "balance_eth": 4951760149.136079,
+      "balance_wei": 4951760149136078469596496896,
+      "nonce": 100
+    },
+    "chain_b": {
+      "balance_eth": 4951760155.256079,
+      "balance_wei": 4951760155256078469596496896,
+      "nonce": 96
+    }
+  },
+  "changes": {
+    "chain_a": {
+      "change_eth": -0.02,
+      "change_wei": -20000000000000000
+    },
+    "chain_b": {
+      "change_eth": 0.0,
+      "change_wei": 0
+    }
+  },
+  "cross_chain_verification": {
+    "is_true_cross_chain": false,
+    "source_chain_decreased": true,
+    "target_chain_increased": false,
+    "verification_result": "FAILED"
+  },
+  "timestamp": "2025-10-12 19:34:10"
+}

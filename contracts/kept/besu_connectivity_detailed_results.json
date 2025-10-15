@@ -1,0 +1,47 @@
+{
+  "chain_a": {
+    "connected": true,
+    "block_number": 31919,
+    "rpc_url": "http://localhost:8545"
+  },
+  "chain_b": {
+    "connected": true,
+    "block_number": 31785,
+    "rpc_url": "http://localhost:8555"
+  },
+  "contracts": {
+    "chain_a": {
+      "contracts": {
+        "DIDVerifier": {
+          "exists": true,
+          "address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+          "code_length": 20034
+        },
+        "CrossChainBridge": {
+          "exists": true,
+          "address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+          "code_length": 6624
+        }
+      }
+    },
+    "chain_b": {
+      "contracts": {
+        "DIDVerifier": {
+          "exists": true,
+          "address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+          "code_length": 20034
+        },
+        "CrossChainBridge": {
+          "exists": true,
+          "address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+          "code_length": 6624
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_contracts": 4,
+    "working_contracts": 4,
+    "success_rate": 100.0
+  }
+}

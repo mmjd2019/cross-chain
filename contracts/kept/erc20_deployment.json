@@ -1,0 +1,24 @@
+{
+  "chain_a": {
+    "chain_name": "Besu Chain A",
+    "token_name": "CrossChain Token",
+    "token_symbol": "CCT",
+    "token_decimals": 18,
+    "initial_supply": 1000000,
+    "address": "0x14D83c34ba0E1caC363039699d495e733B8A1182",
+    "tx_hash": "0x97274e27b2139b5cc59755d6de1090c249ac1b4f0c3bf5570fdfd0ef606ce39d",
+    "block_number": 35944,
+    "gas_used": 1591072
+  },
+  "chain_b": {
+    "chain_name": "Besu Chain B",
+    "token_name": "CrossChain Token",
+    "token_symbol": "CCT",
+    "token_decimals": 18,
+    "initial_supply": 1000000,
+    "address": "0x8Ce489412b110427695f051dAE4055d565BC7cF4",
+    "tx_hash": "0x0c97b0144b3cab2a346243022895981bf831e642bfbdae4e16ce0f897226baa9",
+    "block_number": 35811,
+    "gas_used": 1591072
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "chain_a": {
+    "address": "0xfbB2A5e532C6aA66fd1370ADDdbB37202d8C7b30",
+    "tx_hash": "0x1175c03e945a4883b3685b1f5d1c08a1bdb0254bd948b02a77513e3d7a9beee8",
+    "block_number": 37495,
+    "gas_used": 1409734
+  },
+  "chain_b": {
+    "address": "0xa3713361e659829315B495BA0424286bCd104663",
+    "tx_hash": "0x31baefd0e00889bdf5d9b655948ec0fb20e573b845b58b4ca59fd2ef2a644dbd",
+    "block_number": 37362,
+    "gas_used": 1409734
+  }
+}

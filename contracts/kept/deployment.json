@@ -1,0 +1,16 @@
+{
+  "DIDVerifier": {
+    "name": "DIDVerifier",
+    "address": "0xE1345f203Aad00Fdf8BE549BcfDfa1a6B7ce53Aa",
+    "tx_hash": "0x12a1b29014b2379876b9c53186fde18e496fc16b3db7ed692f7b690fc7bbb3f0",
+    "gas_used": 873979,
+    "block_number": 21812
+  },
+  "AssetManager": {
+    "name": "AssetManager",
+    "address": "0xBF8200e2025b161307e9EEa38bE1D19598818C7A",
+    "tx_hash": "0x1e1a3f24358be69565b0120dfd476895cec496bf3452fa283b9f2389fd53392e",
+    "gas_used": 1069634,
+    "block_number": 21816
+  }
+}

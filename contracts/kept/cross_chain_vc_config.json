@@ -1,0 +1,66 @@
+{
+  "server_ip": "192.168.230.178",
+  "acapy_services": {
+    "issuer": {
+      "admin_url": "http://192.168.230.178:8000",
+      "endpoint": "http://192.168.230.178:8000",
+      "port": 8000,
+      "admin_port": 8080
+    },
+    "holder": {
+      "admin_url": "http://192.168.230.178:8001",
+      "endpoint": "http://192.168.230.178:8001",
+      "port": 8001,
+      "admin_port": 8081
+    }
+  },
+  "genesis": {
+    "url": "http://192.168.230.178/genesis",
+    "network_name": "von-network"
+  },
+  "schema": {
+    "name": "CrossChainLockCredential",
+    "version": "1.0",
+    "attributes": [
+      "sourceChain",
+      "targetChain",
+      "amount",
+      "tokenAddress",
+      "lockId",
+      "transactionHash",
+      "expiry",
+      "userAddress"
+    ]
+  },
+  "credential_definition": {
+    "tag": "cross-chain-lock",
+    "support_revocation": false
+  },
+  "cross_chain_chains": {
+    "chain_a": {
+      "name": "Besu Chain A",
+      "chain_id": 1337,
+      "rpc_url": "http://localhost:8545",
+      "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af"
+    },
+    "chain_b": {
+      "name": "Besu Chain B",
+      "chain_id": 1338,
+      "rpc_url": "http://localhost:8546",
+      "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af"
+    }
+  },
+  "oracle": {
+    "service_url": "http://localhost:5000",
+    "private_key": "0x1234567890123456789012345678901234567890123456789012345678901234"
+  },
+  "test_data": {
+    "source_chain": "chain_a",
+    "target_chain": "chain_b",
+    "amount": "100",
+    "token_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+    "lock_id": "test_lock_123456",
+    "transaction_hash": "0xabcdef1234567890",
+    "user_address": "0x1234567890123456789012345678901234567890"
+  }
+}

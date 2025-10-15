@@ -1,0 +1,12 @@
+{
+  "chain_a": {
+    "chain_name": "Besu Chain A",
+    "token_address": "0x14D83c34ba0E1caC363039699d495e733B8A1182",
+    "status": "failed"
+  },
+  "chain_b": {
+    "chain_name": "Besu Chain B",
+    "token_address": "0x8Ce489412b110427695f051dAE4055d565BC7cF4",
+    "status": "failed"
+  }
+}

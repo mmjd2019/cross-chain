@@ -1,0 +1,18 @@
+{
+  "chain_a": {
+    "success": true,
+    "old_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+    "new_address": "0xc7253857256391E518c4aF60aDa5Eb5972Dd6Dbc",
+    "tx_hash": "0xc79a09781db4d2b9628e6a44de31bb3d320dbc7fe1bf3c1b2f67e59334724dc0",
+    "block_number": 36892,
+    "gas_used": 2518964
+  },
+  "chain_b": {
+    "success": true,
+    "old_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+    "new_address": "0x27e5Ee255a177D1902D7FF48D66f950ed9408867",
+    "tx_hash": "0x2fd6e7c0170f28a0257e283fd5b01b8dba7c7cec8fbf8097328ba4c263d2c8f6",
+    "block_number": 36759,
+    "gas_used": 2518964
+  }
+}

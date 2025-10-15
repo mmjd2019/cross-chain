@@ -1,0 +1,137 @@
+{
+  "test_id": "cross_chain_test_1760238778",
+  "start_time": "2025-10-12T11:12:58.561536",
+  "steps": [
+    {
+      "step_name": "\u8fde\u63a5Besu Chain A",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:58.642114",
+      "details": {
+        "block_number": 32214,
+        "rpc_url": "http://localhost:8545"
+      }
+    },
+    {
+      "step_name": "\u8fde\u63a5Besu Chain B",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:58.704304",
+      "details": {
+        "block_number": 32080,
+        "rpc_url": "http://localhost:8555"
+      }
+    },
+    {
+      "step_name": "\u83b7\u53d6Besu Chain A\u4f59\u989d",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:58.749069",
+      "details": {
+        "balance_wei": 4951760155506078469596496896,
+        "balance_eth": 4951760155.506079
+      }
+    },
+    {
+      "step_name": "\u83b7\u53d6Besu Chain B\u4f59\u989d",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:58.848825",
+      "details": {
+        "balance_wei": 4951760155506078469596496896,
+        "balance_eth": 4951760155.506079
+      }
+    },
+    {
+      "step_name": "\u6d4b\u8bd5Besu Chain A\u5408\u7ea6\u8bbf\u95ee",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:58.973468",
+      "details": {
+        "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+        "bridge_code_length": 6624,
+        "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+        "verifier_code_length": 20034
+      }
+    },
+    {
+      "step_name": "\u6d4b\u8bd5Besu Chain B\u5408\u7ea6\u8bbf\u95ee",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.076242",
+      "details": {
+        "bridge_address": "0x79eafd0b5ec8d3f945e6bb2817ed90b046c0d0af",
+        "bridge_code_length": 6624,
+        "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+        "verifier_code_length": 20034
+      }
+    },
+    {
+      "step_name": "\u6d4b\u8bd5Besu Chain A\u5408\u7ea6\u51fd\u6570",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.135412",
+      "details": {
+        "bridge_owner_call": "0x00000000000000000000000019e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+        "function_test": "owner()"
+      }
+    },
+    {
+      "step_name": "\u6d4b\u8bd5Besu Chain B\u5408\u7ea6\u51fd\u6570",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.235704",
+      "details": {
+        "bridge_owner_call": "0x00000000000000000000000019e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+        "function_test": "owner()"
+      }
+    },
+    {
+      "step_name": "\u6a21\u62df\u8d44\u4ea7\u9501\u5b9a",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.236050",
+      "details": {
+        "user": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+        "amount": 1000000000000000000,
+        "token_address": "0x0000000000000000000000000000000000000000",
+        "target_chain": "chain_b",
+        "lock_id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "timestamp": "2025-10-12T11:12:59.236044"
+      }
+    },
+    {
+      "step_name": "\u6a21\u62dfVC\u9881\u53d1",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.236223",
+      "details": {
+        "credential_id": "vc_1760238779",
+        "source_chain": "chain_a",
+        "target_chain": "chain_b",
+        "amount": "1000000000000000000",
+        "token_address": "0x0000000000000000000000000000000000000000",
+        "lock_id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "user_did": "YL2HDxkVL8qMrssaZbvtfH",
+        "issuer_did": "DPvobytTtKvmyeRTJZYjsg",
+        "timestamp": "2025-10-12T11:12:59.236219"
+      }
+    },
+    {
+      "step_name": "\u6a21\u62df\u8d44\u4ea7\u89e3\u9501",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.236443",
+      "details": {
+        "user": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+        "amount": "1000000000000000000",
+        "token_address": "0x0000000000000000000000000000000000000000",
+        "source_chain": "chain_a",
+        "vc_id": "vc_1760238779",
+        "timestamp": "2025-10-12T11:12:59.236422"
+      }
+    },
+    {
+      "step_name": "\u9a8c\u8bc1\u8de8\u94fe\u8f6c\u79fb",
+      "status": "\u6210\u529f",
+      "timestamp": "2025-10-12T11:12:59.236590",
+      "details": {
+        "total_steps": 11,
+        "successful_steps": 11,
+        "final_balance_a": 4951760155506078469596496896,
+        "final_balance_b": 4951760155506078469596496896
+      }
+    }
+  ],
+  "final_status": "success",
+  "end_time": "2025-10-12T11:12:59.236689"
+}

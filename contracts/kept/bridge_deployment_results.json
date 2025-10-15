@@ -1,0 +1,18 @@
+{
+  "chain_a": {
+    "chain_name": "Besu Chain A",
+    "rpc_url": "http://localhost:8545",
+    "verifier": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+    "contracts": {
+      "simple_bridge": "0x08425d9df219f93d5763c3e85204cb5b4ce33aaa"
+    }
+  },
+  "chain_b": {
+    "chain_name": "Besu Chain B",
+    "rpc_url": "http://localhost:8555",
+    "verifier": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+    "contracts": {
+      "simple_bridge": "0x08425d9df219f93d5763c3e85204cb5b4ce33aaa"
+    }
+  }
+}

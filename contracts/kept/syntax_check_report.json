@@ -1,0 +1,19 @@
+{
+  "syntax_check_summary": {
+    "total_contracts": 5,
+    "passed_contracts": 0,
+    "failed_contracts": 5,
+    "success_rate": "0.0%"
+  },
+  "contract_results": {
+    "IERC20.sol": false,
+    "CrossChainDIDVerifier.sol": false,
+    "CrossChainBridge.sol": false,
+    "CrossChainToken.sol": false,
+    "AssetManager.sol": false
+  },
+  "recommendations": [
+    "部分合约语法检查未通过",
+    "请修复语法错误后重新检查"
+  ]
+}

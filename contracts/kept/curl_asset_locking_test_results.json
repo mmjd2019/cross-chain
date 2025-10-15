@@ -1,0 +1,7 @@
+{
+  "chain_connection": true,
+  "account_balance": true,
+  "contract_functions": true,
+  "did_verification": false,
+  "transaction_creation": true
+}

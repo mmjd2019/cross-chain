@@ -61,8 +61,8 @@
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-username/cross-chain-vc-system.git
-   cd cross-chain-vc-system
+   git clone https://github.com/mmjd2019/cross-chain.git
+   cd cross-chain
    ```
 
 2. **启动Besu区块链**
@@ -82,7 +82,7 @@
    ```bash
    # 启动发行者服务
    aca-py start --admin 0.0.0.0 8080 --admin-insecure-mode --endpoint http://localhost:8080/ --inbound-transport http 0.0.0.0 8080 --outbound-transport http --log-level info --auto-provision --wallet-type indy --wallet-name issuer --wallet-key issuer --genesis-url http://localhost:9000/genesis
-
+   
    # 启动持有者服务
    aca-py start --admin 0.0.0.0 8081 --admin-insecure-mode --endpoint http://localhost:8081/ --inbound-transport http 0.0.0.0 8081 --outbound-transport http --log-level info --auto-provision --wallet-type indy --wallet-name holder --wallet-key holder --genesis-url http://localhost:9000/genesis
    ```
@@ -210,7 +210,7 @@ python3 test_contracts.py
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 Apache-2.0许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 🙏 致谢
 
@@ -221,9 +221,9 @@ python3 test_contracts.py
 
 ## 📞 联系我们
 
-- 项目链接: [https://github.com/your-username/cross-chain-vc-system](https://github.com/your-username/cross-chain-vc-system)
+- 项目链接: [https://github.com/your-username/cross-chain-vc-system](https://github.com/mmjd2019/cross-chain
 - 问题反馈: [Issues](https://github.com/your-username/cross-chain-vc-system/issues)
-- 邮箱: your-email@example.com
+- 邮箱: ggg1234567@163.com
 
 ## 🔮 路线图
 

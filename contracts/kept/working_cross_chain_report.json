@@ -1,0 +1,76 @@
+{
+  "transfer_info": {
+    "amount_eth": 0.1,
+    "amount_wei": 100000000000000000,
+    "from_chain": "chain_a",
+    "to_chain": "chain_b",
+    "source_account": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+    "target_account": "0x2e988A386a799F506693793c6A5AF6B54dfAaBfB",
+    "destroy_tx_hash": "0xcbcc3fc9c8d78bd07f4bc874c0f5370918eab54340928c0abe6e9ecb173b74db",
+    "release_tx_hash": "0x0a32651650c05a83a5553d1d2466acc65d0e0a16a06d538ca342119791e36aa9",
+    "destroy_block": 35500,
+    "release_block": 35367
+  },
+  "before_status": {
+    "chain_a_source": {
+      "chain_id": "chain_a",
+      "chain_name": "Besu Chain A",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "balance_wei": 4951760151306078469596496896,
+      "balance_eth": 4951760151.306079,
+      "timestamp": "2025-10-12T19:10:21.539054"
+    },
+    "chain_b_target": {
+      "chain_id": "chain_b",
+      "chain_name": "Besu Chain B",
+      "account_address": "0x2e988A386a799F506693793c6A5AF6B54dfAaBfB",
+      "balance_wei": 0,
+      "balance_eth": 0.0,
+      "timestamp": "2025-10-12T19:10:21.549676"
+    }
+  },
+  "after_status": {
+    "chain_a_source": {
+      "chain_id": "chain_a",
+      "chain_name": "Besu Chain A",
+      "account_address": "0x81Be24626338695584B5beaEBf51e09879A0eCc6",
+      "balance_wei": 4951760151206078469596496896,
+      "balance_eth": 4951760151.206079,
+      "timestamp": "2025-10-12T19:10:54.107609"
+    },
+    "chain_b_target": {
+      "chain_id": "chain_b",
+      "chain_name": "Besu Chain B",
+      "account_address": "0x2e988A386a799F506693793c6A5AF6B54dfAaBfB",
+      "balance_wei": 200000000000000000,
+      "balance_eth": 0.2,
+      "timestamp": "2025-10-12T19:10:54.116356"
+    }
+  },
+  "changes": {
+    "chain_a_source": {
+      "chain_name": "Besu Chain A",
+      "account_type": "source",
+      "before_eth": 4951760151.306079,
+      "after_eth": 4951760151.206079,
+      "change_eth": -0.10000038146972656,
+      "before_wei": 4951760151306078469596496896,
+      "after_wei": 4951760151206078469596496896,
+      "change_wei": -100000000000000000,
+      "percentage_change": -2.0194916234654544e-09
+    },
+    "chain_b_target": {
+      "chain_name": "Besu Chain B",
+      "account_type": "target",
+      "before_eth": 0.0,
+      "after_eth": 0.2,
+      "change_eth": 0.2,
+      "before_wei": 0,
+      "after_wei": 200000000000000000,
+      "change_wei": 200000000000000000,
+      "percentage_change": 0
+    }
+  },
+  "success": true,
+  "timestamp": "2025-10-12T19:10:54.117589"
+}

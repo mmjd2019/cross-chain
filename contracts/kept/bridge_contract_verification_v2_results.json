@@ -1,0 +1,10 @@
+{
+  "chain_a": {
+    "success": true,
+    "already_verified": true
+  },
+  "chain_b": {
+    "success": true,
+    "already_verified": true
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "chains": [
+    {
+      "name": "Besu Chain A",
+      "rpc_url": "http://localhost:8545",
+      "chain_id": "chain_a",
+      "chain_type": 2,
+      "private_key": "0x076c1c44551a9505f179fa29df6bc456276ffb60e98312e2360f923b42dfb52a",
+      "gas_price": 1000000000,
+      "gas_limit": 3000000,
+      "bridge_address": "0xc7253857256391E518c4aF60aDa5Eb5972Dd6Dbc",
+      "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+      "description": "\u7b2c\u4e00\u6761Besu\u94fe\uff0c\u652f\u6301\u9501\u5b9a\u548c\u89e3\u9501"
+    },
+    {
+      "name": "Besu Chain B",
+      "rpc_url": "http://localhost:8555",
+      "chain_id": "chain_b",
+      "chain_type": 2,
+      "private_key": "0x076c1c44551a9505f179fa29df6bc456276ffb60e98312e2360f923b42dfb52a",
+      "gas_price": 1000000000,
+      "gas_limit": 3000000,
+      "bridge_address": "0x27e5Ee255a177D1902D7FF48D66f950ed9408867",
+      "verifier_address": "0x73b647cba2fe75ba05b8e12ef8f8d6327d6367bf",
+      "description": "\u7b2c\u4e8c\u6761Besu\u94fe\uff0c\u652f\u6301\u9501\u5b9a\u548c\u89e3\u9501"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "CrossChain Token A",
+      "symbol": "CCTA",
+      "decimals": 18,
+      "initial_supply": 1000000,
+      "description": "\u94feA\u4e0a\u7684\u8de8\u94fe\u4ee3\u5e01"
+    },
+    {
+      "name": "CrossChain Token B",
+      "symbol": "CCTB",
+      "decimals": 18,
+      "initial_supply": 1000000,
+      "description": "\u94feB\u4e0a\u7684\u8de8\u94fe\u4ee3\u5e01"
+    }
+  ],
+  "oracle": {
+    "admin_url": "http://localhost:8001",
+    "oracle_did": "DPvobytTtKvmyeRTJZYjsg",
+    "oracle_address": "0x81be24626338695584b5beaebf51e09879a0ecc6",
+    "oracle_private_key": "0x076c1c44551a9505f179fa29df6bc456276ffb60e98312e2360f923b42dfb52a",
+    "description": "\u8de8\u94feOracle\u670d\u52a1\u914d\u7f6e"
+  },
+  "bridge": {
+    "proof_validity_period": 86400,
+    "max_supported_chains": 10,
+    "description": "\u8de8\u94fe\u6865\u914d\u7f6e\u53c2\u6570"
+  },
+  "deployment": {
+    "auto_configure": true,
+    "save_artifacts": true,
+    "description": "\u90e8\u7f72\u914d\u7f6e\u9009\u9879"
+  }
+}

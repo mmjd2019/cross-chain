@@ -1,0 +1,16 @@
+{
+  "chain_a": {
+    "success": true,
+    "already_supported": false,
+    "tx_hash": "0x6ae05974d039d0defdb7d846590288259b478f70a4ba2e6c9d0869022b3e3b56",
+    "block_number": 36904,
+    "gas_used": 119021
+  },
+  "chain_b": {
+    "success": true,
+    "already_supported": false,
+    "tx_hash": "0x417530842f7f6ed6268a160d087cddf34a65f6897f62257d23c67708e8b1c7d5",
+    "block_number": 36771,
+    "gas_used": 119021
+  }
+}

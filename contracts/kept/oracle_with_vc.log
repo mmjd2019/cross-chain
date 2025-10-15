@@ -1,0 +1,155 @@
+2025-10-12 10:04:07,752 - __main__ - INFO - ==================================================
+2025-10-12 10:04:07,753 - __main__ - INFO - 开始Oracle VC集成功能全面测试
+2025-10-12 10:04:07,753 - __main__ - INFO - ==================================================
+2025-10-12 10:04:07,753 - __main__ - INFO - 
+1. 测试基础集成功能
+2025-10-12 10:04:07,753 - __main__ - INFO - 开始测试Oracle VC集成功能
+2025-10-12 10:04:07,753 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 10:04:07,754 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 10:04:07,817 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 10:04:07,934 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 10:04:07,935 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 10:04:07,935 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 10:04:07,935 - __main__ - INFO - Oracle服务初始化成功
+2025-10-12 10:04:07,949 - enhanced_oracle_with_vc - INFO - 生成跨链VC数据: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '1000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'test_lock_123456', 'transaction_hash': '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T10:04:07.949203', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 10:04:07,949 - __main__ - INFO - 生成的VC数据: {
+  "source_chain": "chain_a",
+  "target_chain": "chain_b",
+  "amount": "1000000000000000000",
+  "token_address": "0x0000000000000000000000000000000000000000",
+  "lock_id": "test_lock_123456",
+  "transaction_hash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "user_address": "0x1234567890123456789012345678901234567890",
+  "expiry": "2025-10-13T10:04:07.949203",
+  "user_did": "YL2HDxkVL8qMrssaZbvtfH"
+}
+2025-10-12 10:04:07,955 - enhanced_oracle_with_vc - INFO - 未找到现有连接，创建新连接...
+2025-10-12 10:04:07,961 - enhanced_oracle_with_vc - ERROR - 发行者创建邀请失败
+2025-10-12 10:04:07,962 - enhanced_oracle_with_vc - ERROR - 无法建立连接
+2025-10-12 10:04:07,962 - __main__ - ERROR - VC颁发失败
+2025-10-12 10:04:07,963 - __main__ - INFO - 未找到VC状态
+2025-10-12 10:04:07,963 - enhanced_oracle_with_vc - INFO - 验证跨链证明: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '1000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'test_lock_123456', 'transaction_hash': '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T10:04:07.949203', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 10:04:07,963 - __main__ - INFO - 跨链证明验证结果: True
+2025-10-12 10:04:07,964 - __main__ - INFO - Oracle VC集成功能测试完成
+2025-10-12 10:04:07,964 - __main__ - INFO - 
+2. 测试连接管理功能
+2025-10-12 10:04:07,964 - __main__ - INFO - 开始测试连接管理功能
+2025-10-12 10:04:07,965 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 10:04:07,965 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 10:04:07,983 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 10:04:08,002 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 10:04:08,003 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 10:04:08,003 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 10:04:08,012 - enhanced_oracle_with_vc - INFO - 未找到现有连接，创建新连接...
+2025-10-12 10:04:08,020 - enhanced_oracle_with_vc - ERROR - 发行者创建邀请失败
+2025-10-12 10:04:08,021 - __main__ - ERROR - 连接管理失败
+2025-10-12 10:04:08,029 - __main__ - INFO - 连接管理功能测试完成
+2025-10-12 10:04:08,032 - __main__ - INFO - 
+3. 测试完整VC工作流程
+2025-10-12 10:04:08,033 - __main__ - INFO - 开始测试完整VC工作流程
+2025-10-12 10:04:08,033 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 10:04:08,033 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 10:04:08,045 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 10:04:08,074 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 10:04:08,074 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 10:04:08,075 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 10:04:08,075 - enhanced_oracle_with_vc - INFO - 检测到链 chain_a 的资产锁定事件: {'user': '0x1234567890123456789012345678901234567890', 'amount': '2000000000000000000', 'token': '0x0000000000000000000000000000000000000000', 'lockId': 'workflow_test_lock_789', 'txHash': '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'}
+2025-10-12 10:04:08,075 - enhanced_oracle_with_vc - INFO - 生成跨链VC数据: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '2000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'workflow_test_lock_789', 'transaction_hash': '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T10:04:08.075131', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 10:04:08,077 - enhanced_oracle_with_vc - INFO - 未找到现有连接，创建新连接...
+2025-10-12 10:04:08,079 - enhanced_oracle_with_vc - ERROR - 发行者创建邀请失败
+2025-10-12 10:04:08,079 - enhanced_oracle_with_vc - ERROR - 无法建立连接
+2025-10-12 10:04:08,080 - enhanced_oracle_with_vc - ERROR - VC颁发失败
+2025-10-12 10:04:13,094 - __main__ - INFO - 工作流程测试完成，但未找到VC状态
+2025-10-12 10:04:13,095 - __main__ - INFO - 完整VC工作流程测试完成
+2025-10-12 10:04:13,095 - __main__ - INFO - 
+==================================================
+2025-10-12 10:04:13,095 - __main__ - INFO - 所有测试完成！
+2025-10-12 10:04:13,095 - __main__ - INFO - ==================================================
+2025-10-12 17:56:03,241 - __main__ - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 17:56:03,242 - __main__ - INFO - VC配置文件加载成功
+2025-10-12 17:56:03,258 - __main__ - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 17:56:03,268 - __main__ - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 17:56:03,268 - __main__ - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 17:56:03,268 - __main__ - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 17:56:03,268 - __main__ - INFO - 增强版跨链Oracle服务启动
+2025-10-12 17:56:03,270 - __main__ - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:03,271 - __main__ - ERROR - 处理待处理VC时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:33,304 - __main__ - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:33,306 - __main__ - ERROR - 处理待处理VC时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,501 - __main__ - INFO - ==================================================
+2025-10-12 17:56:52,503 - __main__ - INFO - 开始Oracle VC集成功能全面测试
+2025-10-12 17:56:52,504 - __main__ - INFO - ==================================================
+2025-10-12 17:56:52,504 - __main__ - INFO - 
+1. 测试基础集成功能
+2025-10-12 17:56:52,504 - __main__ - INFO - 开始测试Oracle VC集成功能
+2025-10-12 17:56:52,505 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 17:56:52,506 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 17:56:52,516 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 17:56:52,525 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 17:56:52,526 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 17:56:52,526 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 17:56:52,526 - __main__ - INFO - Oracle服务初始化成功
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - INFO - 生成跨链VC数据: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '1000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'test_lock_123456', 'transaction_hash': '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T17:56:52.528057', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 17:56:52,528 - __main__ - INFO - 生成的VC数据: {
+  "source_chain": "chain_a",
+  "target_chain": "chain_b",
+  "amount": "1000000000000000000",
+  "token_address": "0x0000000000000000000000000000000000000000",
+  "lock_id": "test_lock_123456",
+  "transaction_hash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "user_address": "0x1234567890123456789012345678901234567890",
+  "expiry": "2025-10-13T17:56:52.528057",
+  "user_did": "YL2HDxkVL8qMrssaZbvtfH"
+}
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - ERROR - 获取连接时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - ERROR - 无法建立连接
+2025-10-12 17:56:52,528 - __main__ - ERROR - VC颁发失败
+2025-10-12 17:56:52,528 - __main__ - INFO - 未找到VC状态
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - INFO - 验证跨链证明: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '1000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'test_lock_123456', 'transaction_hash': '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T17:56:52.528057', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 17:56:52,528 - __main__ - INFO - 跨链证明验证结果: True
+2025-10-12 17:56:52,528 - __main__ - INFO - Oracle VC集成功能测试完成
+2025-10-12 17:56:52,528 - __main__ - INFO - 
+2. 测试连接管理功能
+2025-10-12 17:56:52,528 - __main__ - INFO - 开始测试连接管理功能
+2025-10-12 17:56:52,528 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 17:56:52,529 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 17:56:52,536 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 17:56:52,547 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 17:56:52,547 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 17:56:52,548 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 17:56:52,549 - enhanced_oracle_with_vc - ERROR - 获取连接时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,549 - __main__ - ERROR - 连接管理失败
+2025-10-12 17:56:52,550 - enhanced_oracle_with_vc - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,550 - __main__ - INFO - 连接管理功能测试完成
+2025-10-12 17:56:52,551 - __main__ - INFO - 
+3. 测试完整VC工作流程
+2025-10-12 17:56:52,551 - __main__ - INFO - 开始测试完整VC工作流程
+2025-10-12 17:56:52,551 - enhanced_oracle_with_vc - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 17:56:52,551 - enhanced_oracle_with_vc - INFO - VC配置文件加载成功
+2025-10-12 17:56:52,559 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 17:56:52,567 - enhanced_oracle_with_vc - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 17:56:52,567 - enhanced_oracle_with_vc - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 17:56:52,567 - enhanced_oracle_with_vc - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 17:56:52,567 - enhanced_oracle_with_vc - INFO - 检测到链 chain_a 的资产锁定事件: {'user': '0x1234567890123456789012345678901234567890', 'amount': '2000000000000000000', 'token': '0x0000000000000000000000000000000000000000', 'lockId': 'workflow_test_lock_789', 'txHash': '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'}
+2025-10-12 17:56:52,567 - enhanced_oracle_with_vc - INFO - 生成跨链VC数据: {'source_chain': 'chain_a', 'target_chain': 'chain_b', 'amount': '2000000000000000000', 'token_address': '0x0000000000000000000000000000000000000000', 'lock_id': 'workflow_test_lock_789', 'transaction_hash': '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', 'user_address': '0x1234567890123456789012345678901234567890', 'expiry': '2025-10-13T17:56:52.567541', 'user_did': 'YL2HDxkVL8qMrssaZbvtfH'}
+2025-10-12 17:56:52,568 - enhanced_oracle_with_vc - ERROR - 获取连接时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:52,568 - enhanced_oracle_with_vc - ERROR - 无法建立连接
+2025-10-12 17:56:52,568 - enhanced_oracle_with_vc - ERROR - VC颁发失败
+2025-10-12 17:56:57,583 - __main__ - INFO - 工作流程测试完成，但未找到VC状态
+2025-10-12 17:56:57,584 - __main__ - INFO - 完整VC工作流程测试完成
+2025-10-12 17:56:57,585 - __main__ - INFO - 
+==================================================
+2025-10-12 17:56:57,585 - __main__ - INFO - 所有测试完成！
+2025-10-12 17:56:57,585 - __main__ - INFO - ==================================================
+2025-10-12 17:56:59,563 - __main__ - INFO - 配置文件 cross_chain_config.json 加载成功
+2025-10-12 17:56:59,564 - __main__ - INFO - VC配置文件加载成功
+2025-10-12 17:56:59,581 - __main__ - ERROR - 链 Besu Chain A 连接失败
+2025-10-12 17:56:59,591 - __main__ - ERROR - 链 Besu Chain B 连接失败
+2025-10-12 17:56:59,591 - __main__ - INFO - ACA-Py连接初始化完成 - 发行者: http://192.168.230.178:8000, 持有者: http://192.168.230.178:8001
+2025-10-12 17:56:59,591 - __main__ - INFO - 增强版跨链Oracle服务初始化完成
+2025-10-12 17:56:59,591 - __main__ - INFO - 增强版跨链Oracle服务启动
+2025-10-12 17:56:59,593 - __main__ - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:56:59,594 - __main__ - ERROR - 处理待处理VC时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:57:29,629 - __main__ - ERROR - 检查连接状态时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]
+2025-10-12 17:57:29,630 - __main__ - ERROR - 处理待处理VC时出错: Cannot connect to host 192.168.230.178:8000 ssl:default [Network is unreachable]

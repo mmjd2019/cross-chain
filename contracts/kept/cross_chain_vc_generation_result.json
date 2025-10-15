@@ -1,0 +1,10 @@
+{
+  "success": false,
+  "issuer_connection_id": "cf535901-a128-4cd4-9d27-7c87bf966a8b",
+  "holder_connection_id": "247bd363-1faf-4572-aa2c-9a748e648c23",
+  "cred_ex_id": "b90040c7-c2f5-46d8-afd8-e1cbdfb15cc9",
+  "credential_id": null,
+  "error": "持有者无法发送凭证请求",
+  "invitation_url": "http://192.168.230.178:8000?c_i=%7B%22%40type%22%3A%20%22did%3Asov%3ABzCbsNYhMrjHiqZDTUASHg%3Bspec/connections/1.0/invitation%22%2C%20%22%40id%22%3A%20%2223ce3804-5bb3-4294-8a75-91973cbe1858%22%2C%20%22serviceEndpoint%22%3A%20%22http%3A//192.168.230.178%3A8000%22%2C%20%22recipientKeys%22%3A%20%5B%22E5ts13WYsoKTKp3u8tZ9NnxkC2EWagy51R4d8e9XAT2j%22%5D%2C%20%22label%22%3A%20%22Issuer.Agent%22%7D",
+  "timestamp": "2025-10-12 09:51:32"
+}

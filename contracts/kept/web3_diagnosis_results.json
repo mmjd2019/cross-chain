@@ -1,0 +1,29 @@
+{
+  "web3_version": "6.11.1",
+  "web3_major_version": 6,
+  "docker_status": true,
+  "besu_connectivity": {
+    "chain_a": {
+      "http": true,
+      "rpc": true,
+      "block_number": 32709
+    },
+    "chain_b": {
+      "http": true,
+      "rpc": true,
+      "block_number": 32575
+    }
+  },
+  "web3_connection": {
+    "chain_a": {
+      "connected": false,
+      "error": "\u8fde\u63a5\u5931\u8d25"
+    },
+    "chain_b": {
+      "connected": false,
+      "error": "\u8fde\u63a5\u5931\u8d25"
+    }
+  },
+  "middleware_working": false,
+  "v5_compatibility": false
+}
