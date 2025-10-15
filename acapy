@@ -1,0 +1,55 @@
+von-network
+./manage start 192.168.230.178 WEB_SERVER_HOST_PORT=80 "LEDGER_INSTANCE_NAME=My Test Ledger"
+
+acapy
+发行者：
+docker run -it --rm \
+  --network host \
+  --name issuer-acapy \
+  -e RUST_BACKTRACE=1 \
+  -p 8080:8080 \
+  -p 8000:8000 \
+  -v $(pwd)/aca-py-wallet-issuer:/home/indy/.indy_client/wallet \
+  bcgovimages/aries-cloudagent:py36-1.16-0_0.6.0 \
+  start \
+  --wallet-type indy \
+  --wallet-storage-type default \
+  --seed 000000000000000000000000000Agent \
+  --wallet-key welldone \
+  --wallet-name issuerWallet \
+  --genesis-url http://192.168.230.178/genesis \
+  --inbound-transport http 0.0.0.0 8000 \
+  --outbound-transport http \
+  --endpoint http://192.168.230.178:8000 \
+  --admin 0.0.0.0 8080 \
+  --admin-insecure-mode \
+  --auto-provision \
+  --auto-accept-invites \
+  --auto-accept-requests \
+  --label Issuer.Agent
+  
+  持有者：
+   docker run -it --rm \
+  --network host \
+  --name holder-acapy \
+  -e RUST_BACKTRACE=1 \
+  -p 8081:8081 \
+  -p 8001:8001 \
+  -v $(pwd)/aca-py-wallet-holder:/home/indy/.indy_client/wallet \
+  bcgovimages/aries-cloudagent:py36-1.16-0_0.6.0 \
+  start \
+  --wallet-type indy \
+  --wallet-storage-type default \
+  --seed 000000000000000000000000001Agent \
+  --wallet-key welldone \
+  --wallet-name holderWallet \
+  --genesis-url http://192.168.230.178/genesis \
+  --inbound-transport http 0.0.0.0 8001 \
+  --outbound-transport http \
+  --endpoint http://192.168.230.178:8001 \
+  --admin 0.0.0.0 8081 \
+  --admin-insecure-mode \
+  --auto-provision \
+  --auto-accept-invites \
+  --auto-accept-requests \
+  --label Holder.Agent
