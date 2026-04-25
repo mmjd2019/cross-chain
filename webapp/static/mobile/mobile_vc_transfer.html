@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VC 跨链传输</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding-bottom: 32px;
+        }
+
+        /* Nav */
+        .navbar {
+            display: flex; align-items: center; padding: 12px 16px;
+            background: white; border-bottom: 1px solid #eee;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar .back-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 20px;
+        }
+        .navbar h1 { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+        .navbar .chain-dots {
+            display: flex; gap: 6px;
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #ccc;
+        }
+        .status-dot.online { background: #10b981; }
+        .status-dot.offline { background: #ef4444; }
+
+        .content { padding: 0 16px; }
+
+        /* Section */
+        .section-card {
+            background: white; border-radius: 14px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .section-card h3 {
+            font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #555;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* Filter row */
+        .filter-row {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .filter-row select {
+            flex: 1; padding: 8px 10px; border: 1.5px solid #e0e0e0;
+            border-radius: 8px; font-size: 13px; background: #fafafa;
+        }
+        .filter-row button {
+            padding: 8px 14px; border: none; border-radius: 8px;
+            background: #f59e0b; color: white; font-size: 13px;
+            font-weight: 600; cursor: pointer; white-space: nowrap;
+        }
+        .filter-row button:active { opacity: 0.8; }
+
+        /* VC List */
+        .vc-card {
+            padding: 12px; border: 1.5px solid #eee; border-radius: 10px;
+            margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .vc-card:active { background: #f9f9f9; }
+        .vc-card .vc-top {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+        }
+        .vc-card .vc-icon { font-size: 18px; }
+        .vc-card .vc-name { font-size: 13px; font-weight: 600; }
+        .vc-card .vc-hash {
+            font-size: 11px; color: #888; font-family: monospace;
+            word-break: break-all; margin-bottom: 4px;
+        }
+        .vc-card .vc-meta {
+            display: flex; justify-content: space-between; font-size: 11px; color: #aaa;
+        }
+        .vc-card .select-btn {
+            display: block; width: 100%; margin-top: 8px; padding: 8px;
+            border: none; border-radius: 8px; background: #fffbeb;
+            color: #d97706; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .vc-card .select-btn:active { background: #fef3c7; }
+
+        /* Empty */
+        .empty-state {
+            text-align: center; padding: 20px 16px; color: #aaa; font-size: 13px;
+        }
+
+        /* Info items */
+        .info-item {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5; font-size: 13px;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-item .lbl { color: #888; }
+        .info-item .val { color: #333; font-weight: 500; text-align: right; max-width: 65%; word-break: break-all; }
+
+        /* Buttons */
+        .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+        .btn {
+            flex: 1; padding: 12px 16px; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-primary { background: #f59e0b; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #555; }
+        .btn-success { background: #10b981; color: white; }
+
+        /* Result Card */
+        .result-card {
+            background: white; border-radius: 14px; margin-bottom: 12px;
+            overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .result-card .result-header {
+            padding: 12px 16px; font-size: 14px; font-weight: 600;
+        }
+        .result-card .result-header.success { background: #ecfdf5; color: #059669; }
+        .result-card .result-header.error { background: #fef2f2; color: #dc2626; }
+        .result-card .result-header.warning { background: #fffbeb; color: #d97706; }
+        .result-card .result-header.info { background: #eef2ff; color: #4f46e5; }
+        .result-card .result-body { padding: 12px 16px; }
+
+        /* Progress Spinner inline */
+        .inline-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid #e0e0e0; border-top-color: #f59e0b;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Overlay */
+        .overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 200; align-items: center; justify-content: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay-box {
+            background: white; border-radius: 16px; padding: 32px 24px;
+            text-align: center; min-width: 200px;
+        }
+        .spinner {
+            width: 36px; height: 36px; border: 3px solid #e0e0e0;
+            border-top-color: #f59e0b; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+        }
+        .overlay-box p { font-size: 14px; color: #555; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 500;
+            z-index: 300; opacity: 0; transition: all 0.3s; pointer-events: none; max-width: 90%;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #ecfdf5; color: #059669; }
+        .toast.error { background: #fef2f2; color: #dc2626; }
+        .toast.warning { background: #fffbeb; color: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Nav -->
+        <div class="navbar">
+            <a href="/static/mobile/mobile_index.html" class="back-btn">‹</a>
+            <h1>VC 跨链传输</h1>
+            <div class="chain-dots">
+                <span class="status-dot" id="chainA"></span>
+                <span class="status-dot" id="chainB"></span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Step 1: Filter & Load -->
+            <div class="section-card">
+                <h3>
+                    <span>选择已发行 VC</span>
+                    <span id="vcCountBadge" style="font-size:11px; color:#aaa;"></span>
+                </h3>
+                <div class="filter-row">
+                    <select id="vcTypeFilter" onchange="filterVcList()">
+                        <option value="">全部类型</option>
+                        <option value="InspectionReport">质检报告</option>
+                        <option value="InsuranceContract">保险合同</option>
+                        <option value="CertificateOfOrigin">原产地证书</option>
+                        <option value="BillOfLadingCertificate">提单证书</option>
+                    </select>
+                    <button onclick="loadIssuedVcs()">刷新列表</button>
+                </div>
+                <div id="vcList"><span class="empty-state">点击"刷新列表"加载 VC</span></div>
+            </div>
+
+            <!-- Step 2: VC Metadata -->
+            <div id="metadataSection" style="display:none;"></div>
+
+            <!-- Step 3: Transfer Progress -->
+            <div id="progressSection" style="display:none;"></div>
+
+            <!-- Step 4: Transfer Result -->
+            <div id="resultSection" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-box">
+            <div class="spinner"></div>
+            <p id="overlayText">处理中...</p>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const VC_NAMES = {
+            'InspectionReport': '质检报告',
+            'InsuranceContract': '保险合同',
+            'CertificateOfOrigin': '原产地证书',
+            'BillOfLadingCertificate': '提单证书'
+        };
+        const VC_ICONS = {
+            'InspectionReport': '📋',
+            'InsuranceContract': '🛡️',
+            'CertificateOfOrigin': '📜',
+            'BillOfLadingCertificate': '🚢'
+        };
+
+        let issuedVcs = [];
+        let selectedVC = null;
+        let pollInterval = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadConfig();
+            checkChainStatus();
+        });
+
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/vc-transfer/config');
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('chainA').className = 'status-dot online';
+                    document.getElementById('chainB').className = 'status-dot online';
+                }
+            } catch (e) {
+                /* ignore */
+            }
+        }
+
+        function checkChainStatus() {
+            fetch('/api/vc-transfer/config').then(r => r.json()).then(data => {
+                if (data.success) {
+                    document.getElementById('chainA').className = 'status-dot online';
+                    document.getElementById('chainB').className = 'status-dot online';
+                }
+            }).catch(() => {});
+        }
+
+        // Load issued VCs
+        async function loadIssuedVcs() {
+            showOverlay('加载 VC 列表...');
+            try {
+                const res = await fetch('/api/vc-transfer/issued-vcs');
+                const data = await res.json();
+                if (data.success) {
+                    issuedVcs = data.vcs || [];
+                    document.getElementById('vcCountBadge').textContent = `${data.total || 0} 个`;
+                    filterVcList();
+                    showToast('success', `已加载 ${data.total} 个 VC`);
+                } else {
+                    showToast('error', data.error || '加载失败');
+                }
+            } catch (e) {
+                showToast('error', '加载失败: ' + e.message);
+            } finally {
+                hideOverlay();
+            }
+        }
+
+        function filterVcList() {
+            const filterType = document.getElementById('vcTypeFilter').value;
+            const container = document.getElementById('vcList');
+
+            let filtered = issuedVcs;
+            if (filterType) filtered = issuedVcs.filter(vc => vc.vc_type === filterType);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<span class="empty-state">暂无 VC 记录</span>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(vc => `
+                <div class="vc-card" onclick="selectVC('${vc.uuid}')">
+                    <div class="vc-top">
+                        <span class="vc-icon">${VC_ICONS[vc.vc_type] || '📄'}</span>
+                        <span class="vc-name">${VC_NAMES[vc.vc_type] || vc.vc_type}</span>
+                    </div>
+                    <div class="vc-hash">${vc.vc_hash ? vc.vc_hash.slice(0, 16) + '...' + vc.vc_hash.slice(-12) : 'N/A'}</div>
+                    <div class="vc-meta">
+                        <span>${vc.contract_name || 'N/A'}</span>
+                        <span>${fmtTime(vc.timestamp)}</span>
+                    </div>
+                    <button class="select-btn" onclick="event.stopPropagation(); selectVC('${vc.uuid}')">选择此 VC</button>
+                </div>
+            `).join('');
+        }
+
+        // Select VC
+        async function selectVC(uuid) {
+            const vc = issuedVcs.find(v => v.uuid === uuid);
+            if (!vc) { showToast('error', '未找到该 VC'); return; }
+
+            selectedVC = vc;
+            showOverlay('获取 VC 元数据...');
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+
+            // Clear previous poll
+            if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+
+            try {
+                const res = await fetch(`/api/vc-transfer/vc-metadata/${vc.vc_type}/${vc.vc_hash}`);
+                const data = await res.json();
+
+                const section = document.getElementById('metadataSection');
+                section.style.display = 'block';
+
+                if (data.success && data.metadata) {
+                    const meta = data.metadata;
+                    section.innerHTML = `
+                        <div class="result-card">
+                            <div class="result-header info">📋 VC 元数据</div>
+                            <div class="result-body">
+                                ${infoItem('VC 名称', meta.vc_name || '-')}
+                                ${infoItem('VC 类型', VC_NAMES[vc.vc_type] || vc.vc_type)}
+                                ${infoItem('VC 哈希', vc.vc_hash)}
+                                ${infoItem('持有人 DID', meta.holder_did || '-')}
+                                ${infoItem('持有人 Endpoint', meta.holder_endpoint || '-')}
+                                ${infoItem('过期时间', meta.expiry_time ? new Date(meta.expiry_time * 1000).toLocaleString() : '-')}
+                                ${infoItem('发行时间', fmtTime(vc.timestamp))}
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-secondary" onclick="cancelSelection()">取消</button>
+                            <button class="btn btn-primary" onclick="initiateTransfer()">发起跨链传输</button>
+                        </div>`;
+                } else {
+                    section.innerHTML = `
+                        <div class="result-card">
+                            <div class="result-header info">📋 VC 基本信息</div>
+                            <div class="result-body">
+                                ${infoItem('VC 类型', VC_NAMES[vc.vc_type] || vc.vc_type)}
+                                ${infoItem('VC 哈希', vc.vc_hash || 'N/A')}
+                                ${infoItem('合约名称', vc.contract_name || 'N/A')}
+                                ${infoItem('UUID', vc.uuid)}
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-secondary" onclick="cancelSelection()">取消</button>
+                            <button class="btn btn-primary" onclick="initiateTransfer()">发起跨链传输</button>
+                        </div>`;
+                }
+                section.scrollIntoView({ behavior: 'smooth' });
+                showToast('success', 'VC 元数据已加载');
+            } catch (e) {
+                showToast('error', '获取元数据失败: ' + e.message);
+                document.getElementById('metadataSection').style.display = 'none';
+            } finally {
+                hideOverlay();
+            }
+        }
+
+        function cancelSelection() {
+            selectedVC = null;
+            document.getElementById('metadataSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+            if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        }
+
+        // Initiate Transfer
+        async function initiateTransfer() {
+            if (!selectedVC) { showToast('error', '请先选择 VC'); return; }
+
+            // Clear previous poll
+            if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+
+            const progressSection = document.getElementById('progressSection');
+            progressSection.style.display = 'block';
+            progressSection.innerHTML = `
+                <div class="result-card">
+                    <div class="result-header warning"><span class="inline-spinner"></span>正在发起跨链传输...</div>
+                    <div class="result-body">
+                        ${infoItem('VC 类型', VC_NAMES[selectedVC.vc_type] || selectedVC.vc_type)}
+                        ${infoItem('VC 哈希', selectedVC.vc_hash)}
+                        ${infoItem('目标链', 'Chain B')}
+                        ${infoItem('等待时间', '<span id="waitTime">0 秒</span>')}
+                    </div>
+                </div>`;
+            progressSection.scrollIntoView({ behavior: 'smooth' });
+
+            document.getElementById('resultSection').style.display = 'none';
+
+            try {
+                const res = await fetch('/api/vc-transfer/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vc_hash: selectedVC.vc_hash,
+                        vc_type: selectedVC.vc_type,
+                        target_chain: 'chain_b'
+                    })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    waitForCompletion(selectedVC.vc_hash);
+                } else {
+                    throw new Error(result.error || '跨链传输失败');
+                }
+            } catch (e) {
+                progressSection.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-header error">❌ 跨链传输失败</div>
+                        <div class="result-body">
+                            <div style="font-size:13px; color:#666; word-break:break-all;">${e.message}</div>
+                        </div>
+                    </div>`;
+                showToast('error', '跨链传输失败: ' + e.message);
+            }
+        }
+
+        function waitForCompletion(vcHash) {
+            let elapsed = 0;
+            const maxWait = 120;
+
+            pollInterval = setInterval(async () => {
+                elapsed += 3;
+                const el = document.getElementById('waitTime');
+                if (el) el.textContent = elapsed + ' 秒';
+
+                try {
+                    const res = await fetch(`/api/vc-transfer/wait-for-completion/${vcHash}?timeout=3`);
+                    const result = await res.json();
+
+                    if (result.found) {
+                        clearInterval(pollInterval);
+                        pollInterval = null;
+                        displayTransferSuccess(result);
+                    } else if (elapsed >= maxWait) {
+                        clearInterval(pollInterval);
+                        pollInterval = null;
+                        displayTransferTimeout();
+                    }
+                } catch (e) { /* keep polling */ }
+            }, 3000);
+
+            // Hard timeout
+            setTimeout(() => {
+                if (pollInterval) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+                    displayTransferTimeout();
+                }
+            }, maxWait * 1000);
+        }
+
+        function displayTransferSuccess(result) {
+            // Update progress
+            document.getElementById('progressSection').innerHTML = `
+                <div class="result-card">
+                    <div class="result-header success">✅ 跨链传输成功！</div>
+                    <div class="result-body">
+                        ${infoItem('耗时', (result.elapsed_time?.toFixed(1) || 'N/A') + ' 秒')}
+                        ${infoItem('检查次数', result.check_count || 'N/A')}
+                    </div>
+                </div>`;
+
+            // Show result
+            const section = document.getElementById('resultSection');
+            section.style.display = 'block';
+            let html = `
+                <div class="result-card">
+                    <div class="result-header">链 A 传输信息</div>
+                    <div class="result-body">
+                        ${infoItem('VC 名称', result.record?.vc_name || selectedVC?.contract_name || 'N/A')}
+                        ${infoItem('源链', result.record?.source_chain || 'Chain A')}
+                        ${infoItem('接收时间', result.record?.timestamp ? new Date(result.record.timestamp * 1000).toLocaleString() : 'N/A')}
+                    </div>
+                </div>`;
+
+            html += `
+                <div class="section-card">
+                    <h3>链 B 接收信息</h3>
+                    <button class="btn btn-success" style="width:100%; margin-bottom:12px;" onclick="readFromChainB()">从链 B 读取接收记录</button>
+                    <div id="chainBInfo"><span class="empty-state">点击上方按钮检查链 B 状态</span></div>
+                </div>`;
+
+            section.innerHTML = html;
+            section.scrollIntoView({ behavior: 'smooth' });
+            showToast('success', '跨链传输成功！');
+        }
+
+        function displayTransferTimeout() {
+            document.getElementById('progressSection').innerHTML = `
+                <div class="result-card">
+                    <div class="result-header warning">⏱ 等待超时</div>
+                    <div class="result-body">
+                        <div style="font-size:13px; color:#888;">跨链传输可能仍在进行中，请手动检查链 B 状态。</div>
+                    </div>
+                </div>`;
+
+            const section = document.getElementById('resultSection');
+            section.style.display = 'block';
+            section.innerHTML = `
+                <div class="section-card">
+                    <h3>链 B 接收信息</h3>
+                    <button class="btn btn-success" style="width:100%; margin-bottom:12px;" onclick="readFromChainB()">从链 B 读取接收记录</button>
+                    <div id="chainBInfo"><span class="empty-state">点击上方按钮检查链 B 状态</span></div>
+                </div>`;
+            showToast('warning', '等待超时，请手动检查');
+        }
+
+        async function readFromChainB() {
+            if (!selectedVC) { showToast('error', '没有选中的 VC'); return; }
+            showOverlay('从链 B 读取...');
+            try {
+                const res = await fetch(`/api/vc-transfer/bridge-record/${selectedVC.vc_hash}`);
+                const result = await res.json();
+                const container = document.getElementById('chainBInfo');
+
+                if (result.success && result.found) {
+                    const r = result.record;
+                    container.innerHTML = `
+                        <div style="padding:8px 0;">
+                            ${infoItem('VC 名称', r.vc_name || '-')}
+                            ${infoItem('源链', r.source_chain || '-')}
+                            ${infoItem('持有人 DID', r.holder_did || '-')}
+                            ${infoItem('持有人 Endpoint', r.holder_endpoint || '-')}
+                            ${infoItem('接收时间', r.timestamp > 0 ? new Date(r.timestamp * 1000).toLocaleString() : '-')}
+                        </div>
+                        <div style="margin-top:8px; padding:8px; background:#ecfdf5; border-radius:8px; font-size:12px; color:#059669;">
+                            🔐 数据来源：链 B 跨链桥合约
+                        </div>`;
+                    showToast('success', '链 B 数据已读取');
+                } else {
+                    container.innerHTML = '<span class="empty-state">链 B 暂未收到该 VC，请稍后重试</span>';
+                    showToast('warning', '链 B 尚未收到');
+                }
+            } catch (e) {
+                showToast('error', '读取失败: ' + e.message);
+            } finally {
+                hideOverlay();
+            }
+        }
+
+        // Helpers
+        function infoItem(lbl, val) {
+            return `<div class="info-item"><span class="lbl">${lbl}</span><span class="val">${val}</span></div>`;
+        }
+
+        function fmtTime(ts) {
+            if (!ts) return '-';
+            try {
+                return new Date(ts).toLocaleString('zh-CN', {
+                    month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                });
+            } catch { return ts; }
+        }
+
+        function showOverlay(text) {
+            document.getElementById('overlayText').textContent = text;
+            document.getElementById('overlay').classList.add('active');
+        }
+        function hideOverlay() {
+            document.getElementById('overlay').classList.remove('active');
+        }
+        function showToast(type, msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

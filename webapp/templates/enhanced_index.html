@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨链VC系统监控面板 - 增强版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            min-height: 100vh;
+            color: #f1f5f9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #f1f5f9;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-online { background-color: #10b981; }
+        .status-offline { background-color: #ef4444; }
+        .status-error { background-color: #f59e0b; }
+        .status-unknown { background-color: #64748b; }
+
+        .status-text {
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-online .status-text { color: #10b981; }
+        .status-offline .status-text { color: #ef4444; }
+        .status-error .status-text { color: #f59e0b; }
+        .status-unknown .status-text { color: #64748b; }
+
+        .card-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .info-value {
+            color: #f1f5f9;
+            font-family: 'Courier New', monospace;
+        }
+
+        .logs-section {
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+        }
+
+        .logs-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #f1f5f9;
+            margin-bottom: 15px;
+        }
+
+        .logs-content {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #64748b;
+        }
+
+        .log-level-info { color: #60a5fa; }
+        .log-level-success { color: #34d399; }
+        .log-level-warning { color: #fbbf24; }
+        .log-level-error { color: #f87171; }
+
+        .refresh-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .refresh-button:hover {
+            background: #1d4ed8;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 跨链VC系统</h1>
+            <div style="margin-top: 20px;">
+                <a href="/vc-issuance" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease; display: inline-block;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">🎫 VC发行服务</a>
+                <a href="/vp-verification" style="background: rgba(39, 174, 96, 0.3); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease; display: inline-block; border: 1px solid rgba(39, 174, 96, 0.5);" onmouseover="this.style.background='rgba(39, 174, 96, 0.5)'" onmouseout="this.style.background='rgba(39, 174, 96, 0.3)'">✓ VP 验证</a>
+                <a href="/vc-crosschain-transfer" style="background: rgba(139, 92, 246, 0.3); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease; display: inline-block; border: 1px solid rgba(139, 92, 246, 0.5);" onmouseover="this.style.background='rgba(139, 92, 246, 0.5)'" onmouseout="this.style.background='rgba(139, 92, 246, 0.3)'">⛓️ VC跨链传输</a>
+                <a href="/contract-viewer" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease; display: inline-block;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">🔍 合约状态查看器</a>
+                <a href="/config-viewer" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 10px; transition: all 0.3s ease; display: inline-block;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">📁 配置文件查看器</a>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Besu Chain A -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔗 Besu Chain A</div>
+                    <div class="status-indicator status-unknown" id="besu-a-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="besu-a-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">RPC:</span>
+                        <span class="info-value">localhost:8545</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">链ID:</span>
+                        <span class="info-value" id="besu-a-chain-id">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">最新区块:</span>
+                        <span class="info-value" id="besu-a-block">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">节点数:</span>
+                        <span class="info-value" id="besu-a-peers">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">同步中:</span>
+                        <span class="info-value" id="besu-a-syncing">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Besu Chain B -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔗 Besu Chain B</div>
+                    <div class="status-indicator status-unknown" id="besu-b-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="besu-b-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">RPC:</span>
+                        <span class="info-value">localhost:8555</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">链ID:</span>
+                        <span class="info-value" id="besu-b-chain-id">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">最新区块:</span>
+                        <span class="info-value" id="besu-b-block">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">节点数:</span>
+                        <span class="info-value" id="besu-b-peers">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">同步中:</span>
+                        <span class="info-value" id="besu-b-syncing">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VC发行Oracle -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎫 VC发行Oracle</div>
+                    <div class="status-indicator status-unknown" id="vc-issuance-oracle-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="vc-issuance-oracle-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">地址:</span>
+                        <span class="info-value">localhost:6000</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="vc-issuance-oracle-detail">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VP验证Oracle -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">✅ VP验证Oracle</div>
+                    <div class="status-indicator status-unknown" id="vp-oracle-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="vp-oracle-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">地址:</span>
+                        <span class="info-value">localhost:7003</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="vp-oracle-detail">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VC传输Oracle -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⛓️ VC传输Oracle</div>
+                    <div class="status-indicator status-unknown" id="vc-transfer-oracle-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="vc-transfer-oracle-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Chain A:</span>
+                        <span class="info-value">localhost:8545</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Chain B:</span>
+                        <span class="info-value">localhost:8555</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="vc-transfer-oracle-detail">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACA-Py 发行者 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📜 ACA-Py 发行者</div>
+                    <div class="status-indicator status-unknown" id="acapy-issuer-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="acapy-issuer-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admin:</span>
+                        <span class="info-value">localhost:8080</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="acapy-issuer-detail">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACA-Py 持有者 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">👤 ACA-Py 持有者</div>
+                    <div class="status-indicator status-unknown" id="acapy-holder-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="acapy-holder-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admin:</span>
+                        <span class="info-value">localhost:8081</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="acapy-holder-detail">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACA-Py 验证者 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔍 ACA-Py 验证者</div>
+                    <div class="status-indicator status-unknown" id="acapy-verifier-status"></div>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">状态:</span>
+                        <span class="info-value status-text" id="acapy-verifier-status-text">检查中...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admin:</span>
+                        <span class="info-value">localhost:8082</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">响应:</span>
+                        <span class="info-value" id="acapy-verifier-detail">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日志区域 -->
+        <div class="logs-section">
+            <div class="logs-title">
+                系统日志
+                <button class="refresh-button" onclick="refreshStatus()">刷新状态</button>
+            </div>
+            <div class="logs-content" id="logsContent">
+                <div class="log-entry">
+                    <span class="log-timestamp">[2025-01-12 12:00:00]</span>
+                    <span class="log-level-info">[INFO]</span>
+                    系统启动中...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket连接
+        const socket = io();
+        
+        // 状态更新处理
+        socket.on('status_update', function(data) {
+            updateDashboard(data);
+        });
+
+        // 更新仪表板
+        function updateDashboard(status) {
+            // Besu链
+            updateServiceStatus('besu-a', status.besu_chain_a);
+            updateServiceStatus('besu-b', status.besu_chain_b);
+
+            // Oracle服务
+            updateServiceStatus('vc-issuance-oracle', status.vc_issuance_oracle);
+            updateServiceStatus('vp-oracle', status.vp_oracle);
+            updateServiceStatus('vc-transfer-oracle', status.vc_transfer_oracle);
+
+            // ACA-Py服务
+            updateServiceStatus('acapy-issuer', status.acapy_issuer);
+            updateServiceStatus('acapy-holder', status.acapy_holder);
+            updateServiceStatus('acapy-verifier', status.acapy_verifier);
+
+            addLog('info', '系统状态已更新');
+        }
+
+        // 更新服务状态
+        function updateServiceStatus(prefix, serviceStatus) {
+            const statusElement = document.getElementById(`${prefix}-status`);
+            const statusTextElement = document.getElementById(`${prefix}-status-text`);
+
+            if (serviceStatus) {
+                statusElement.className = `status-indicator status-${serviceStatus.status}`;
+                statusTextElement.textContent = serviceStatus.status === 'online' ? '在线' : serviceStatus.status === 'offline' ? '离线' : serviceStatus.status.toUpperCase();
+                statusTextElement.className = `info-value status-text status-${serviceStatus.status}`;
+
+                if (serviceStatus.details) {
+                    const details = serviceStatus.details;
+                    if (prefix.startsWith('besu-')) {
+                        updateElement(`${prefix}-chain-id`, details.chain_id || '-');
+                        updateElement(`${prefix}-block`, details.latest_block || '-');
+                        updateElement(`${prefix}-peers`, details.peer_count != null ? details.peer_count : '-');
+                        updateElement(`${prefix}-syncing`, details.syncing != null ? (details.syncing ? '是' : '否') : '-');
+                    } else {
+                        updateElement(`${prefix}-detail`, details.message || details.error || '-');
+                    }
+                }
+            }
+        }
+
+        // 更新元素内容
+        function updateElement(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        // 添加日志
+        function addLog(level, message) {
+            const logsContent = document.getElementById('logsContent');
+            const timestamp = new Date().toLocaleString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level-${level}">[${level.toUpperCase()}]</span>
+                ${message}
+            `;
+            logsContent.appendChild(logEntry);
+            logsContent.scrollTop = logsContent.scrollHeight;
+        }
+
+        // 刷新状态
+        function refreshStatus() {
+            addLog('info', '手动刷新系统状态...');
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateDashboard(data);
+                    addLog('success', '系统状态刷新完成');
+                })
+                .catch(error => {
+                    addLog('error', `刷新失败: ${error.message}`);
+                });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('info', '页面加载完成，开始监控系统状态...');
+            refreshStatus();
+        });
+    </script>
+</body>
+</html>

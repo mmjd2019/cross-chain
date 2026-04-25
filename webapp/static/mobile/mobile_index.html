@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨链VC系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px 32px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 32px 0 24px;
+        }
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .status-chip {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .status-dot.online { background: #10b981; }
+        .status-dot.offline { background: #ef4444; }
+
+        /* Function Cards */
+        .func-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .func-card {
+            display: block;
+            text-decoration: none;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .func-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .func-card .card-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .func-card.issuance .card-accent { background: linear-gradient(180deg, #6366f1, #818cf8); }
+        .func-card.verification .card-accent { background: linear-gradient(180deg, #10b981, #34d399); }
+        .func-card.transfer .card-accent { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+
+        .func-card .card-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+        .func-card .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .func-card.issuance .card-icon { background: #eef2ff; }
+        .func-card.verification .card-icon { background: #ecfdf5; }
+        .func-card.transfer .card-icon { background: #fffbeb; }
+
+        .func-card .card-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .func-card .card-info p {
+            font-size: 12px;
+            color: #888;
+        }
+        .func-card .card-arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            font-size: 18px;
+        }
+
+        /* Quick Info */
+        .quick-info {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .quick-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #555;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label {
+            font-size: 13px;
+            color: #888;
+        }
+        .info-row .value {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            max-width: 60%;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        /* Desktop link */
+        .desktop-link {
+            text-align: center;
+            margin-top: 24px;
+        }
+        .desktop-link a {
+            font-size: 13px;
+            color: #6366f1;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="header-icon">⛓️</div>
+            <h1>跨链可验证凭证系统</h1>
+            <p>Cross-chain Verifiable Credential System</p>
+        </div>
+
+        <!-- Status Chips -->
+        <div class="status-bar" id="statusBar">
+            <div class="status-chip">
+                <span class="status-dot" id="chainAStatus"></span>
+                <span>链 A</span>
+            </div>
+            <div class="status-chip">
+                <span class="status-dot" id="chainBStatus"></span>
+                <span>链 B</span>
+            </div>
+            <div class="status-chip">
+                <span class="status-dot" id="oracleStatus"></span>
+                <span>Oracle</span>
+            </div>
+            <div class="status-chip">
+                <span class="status-dot" id="acapyStatus"></span>
+                <span>ACA-Py</span>
+            </div>
+        </div>
+
+        <!-- Function Cards -->
+        <div class="func-grid">
+            <a href="/static/mobile/mobile_vc_issuance.html" class="func-card issuance">
+                <div class="card-accent"></div>
+                <div class="card-top">
+                    <div class="card-icon">🎫</div>
+                    <div class="card-info">
+                        <h2>VC 发行</h2>
+                        <p>发行可验证凭证到区块链</p>
+                    </div>
+                </div>
+                <span class="card-arrow">›</span>
+            </a>
+
+            <a href="/static/mobile/mobile_vp_verification.html" class="func-card verification">
+                <div class="card-accent"></div>
+                <div class="card-top">
+                    <div class="card-icon">✅</div>
+                    <div class="card-info">
+                        <h2>VP 验证</h2>
+                        <p>验证可验证表达和凭证</p>
+                    </div>
+                </div>
+                <span class="card-arrow">›</span>
+            </a>
+
+            <a href="/static/mobile/mobile_vc_transfer.html" class="func-card transfer">
+                <div class="card-accent"></div>
+                <div class="card-top">
+                    <div class="card-icon">🔗</div>
+                    <div class="card-info">
+                        <h2>VC 跨链传输</h2>
+                        <p>跨链传输可验证凭证</p>
+                    </div>
+                </div>
+                <span class="card-arrow">›</span>
+            </a>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="quick-info">
+            <h3>系统信息</h3>
+            <div class="info-row">
+                <span class="label">系统状态</span>
+                <span class="value" id="systemStatus">检测中...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">链 A 区块</span>
+                <span class="value" id="blockA">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">链 B 区块</span>
+                <span class="value" id="blockB">-</span>
+            </div>
+        </div>
+
+        <div class="desktop-link">
+            <a href="/">切换到桌面版 →</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSystemStatus();
+            setInterval(checkSystemStatus, 30000);
+        });
+
+        async function checkSystemStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                // Chain A
+                const chainA = data.besu_chain_a;
+                if (chainA) {
+                    setStatus('chainAStatus', chainA.status === 'online');
+                    document.getElementById('blockA').textContent = chainA.details?.latest_block || '-';
+                }
+
+                // Chain B
+                const chainB = data.besu_chain_b;
+                if (chainB) {
+                    setStatus('chainBStatus', chainB.status === 'online');
+                    document.getElementById('blockB').textContent = chainB.details?.latest_block || '-';
+                }
+
+                // Oracle
+                const oracle = data.oracle_service;
+                if (oracle) {
+                    setStatus('oracleStatus', oracle.status === 'online');
+                }
+
+                // ACA-Py
+                const issuer = data.acapy_issuer;
+                const holder = data.acapy_holder;
+                const acapyOnline = (issuer?.status === 'online') && (holder?.status === 'online');
+                setStatus('acapyStatus', acapyOnline);
+
+                // Overall
+                const allOnline = chainA?.status === 'online' && chainB?.status === 'online' && oracle?.status === 'online';
+                document.getElementById('systemStatus').textContent = allOnline ? '✅ 正常运行' : '⚠️ 部分服务离线';
+            } catch (e) {
+                document.getElementById('systemStatus').textContent = '❌ 无法连接';
+                ['chainAStatus', 'chainBStatus', 'oracleStatus', 'acapyStatus'].forEach(id => setStatus(id, false));
+            }
+        }
+
+        function setStatus(id, online) {
+            const dot = document.getElementById(id);
+            if (dot) {
+                dot.className = 'status-dot ' + (online ? 'online' : 'offline');
+            }
+        }
+    </script>
+</body>
+</html>

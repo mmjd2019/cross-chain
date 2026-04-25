@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC 跨链传输 - 跨链可验证凭证系统</title>
+    <link rel="stylesheet" href="/static/css/vc_crosschain_transfer.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/" class="back-link">← 返回首页</a>
+                <h1>VC 跨链传输</h1>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="chainAStatus"></span>
+                <span class="status-text">链 A 状态</span>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="chainBStatus"></span>
+                <span class="status-text">链 B 状态</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>VC 管理器合约</h2>
+            </div>
+
+            <!-- VC 管理器列表 -->
+            <div class="vc-manager-list" id="vcManagerList">
+                <div class="empty-state">加载中...</div>
+            </div>
+
+            <!-- 跨链桥信息 -->
+            <div class="sidebar-section">
+                <h3>链 B 跨链桥合约</h3>
+                <div class="bridge-info" id="bridgeInfo">
+                    <div class="empty-state">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 传输历史 -->
+            <div class="sidebar-section">
+                <h3>传输历史</h3>
+                <div class="history-list" id="transferHistory">
+                    <div class="empty-state">暂无传输记录</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 内容区 -->
+        <section class="content">
+            <!-- 步骤 1: 选择已发行 VC -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>步骤 1: 选择已发行 VC</h2>
+                    <span class="badge success" id="vcCountBadge" style="display: none;">0 个 VC</span>
+                </div>
+                <div class="card-body">
+                    <p class="info-text">从 uuid.json 读取已发行的 VC 记录，选择一个 VC 进行跨链传输。</p>
+
+                    <!-- VC 类型过滤器 -->
+                    <div class="action-section">
+                        <label for="vcTypeFilter" class="info-label">VC 类型过滤：</label>
+                        <select id="vcTypeFilter" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <option value="">全部类型</option>
+                            <option value="InspectionReport">质检报告 (InspectionReport)</option>
+                            <option value="InsuranceContract">保险合同 (InsuranceContract)</option>
+                            <option value="CertificateOfOrigin">原产地证书 (CertificateOfOrigin)</option>
+                            <option value="BillOfLadingCertificate">提单证书 (BillOfLadingCertificate)</option>
+                        </select>
+                    </div>
+
+                    <!-- 刷新按钮 -->
+                    <div class="action-section">
+                        <span class="info-text" id="lastRefreshTime">尚未刷新</span>
+                        <button class="btn btn-primary" id="refreshVcsBtn">
+                            <span>🔄</span> 刷新 VC 列表
+                        </button>
+                    </div>
+
+                    <!-- VC 列表 -->
+                    <div class="vc-list-section">
+                        <h3>已发行 VC 列表</h3>
+                        <div class="vc-grid" id="issuedVcGrid">
+                            <div class="empty-state">点击"刷新 VC 列表"加载数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤 2: 查看 VC 元数据 -->
+            <div class="card" id="vcMetadataCard" style="display: none;">
+                <div class="card-header">
+                    <h2>步骤 2: VC 元数据</h2>
+                    <span class="badge success">已选择</span>
+                </div>
+                <div class="card-body">
+                    <div class="transfer-info">
+                        <h3>链上元数据信息</h3>
+                        <div class="info-grid" id="vcMetadataInfo">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+
+                    <div class="transfer-actions">
+                        <button class="btn btn-secondary" id="cancelSelectionBtn">
+                            <span>✕</span> 取消选择
+                        </button>
+                        <button class="btn btn-primary" id="initiateTransferBtn">
+                            <span>⛓️</span> 发起跨链传输
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤 3: 发起跨链传输 -->
+            <div class="card" id="transferProgressCard" style="display: none;">
+                <div class="card-header">
+                    <h2>步骤 3: 跨链传输进行中</h2>
+                </div>
+                <div class="card-body">
+                    <div class="result-section">
+                        <div class="result-item" id="transferStatus">
+                            <div class="result-icon" style="animation: spin 1s linear infinite;">⏳</div>
+                            <div class="result-details">
+                                <div class="result-title">正在发起跨链传输...</div>
+                                <div class="result-data" id="transferProgressInfo">
+                                    <!-- 动态填充进度信息 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤 4: 验证跨链结果 -->
+            <div class="card" id="transferResultCard" style="display: none;">
+                <div class="card-header">
+                    <h2>步骤 4: 跨链传输结果</h2>
+                    <span class="badge success" id="resultBadge">成功</span>
+                </div>
+                <div class="card-body">
+                    <div class="result-section">
+                        <h3>链 A 传输信息</h3>
+                        <div class="result-content" id="chainATransferInfo">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+
+                    <div class="result-section">
+                        <h3>链 B 接收信息</h3>
+                        <button class="btn btn-secondary btn-sm" id="readFromChainBBtn">
+                            <span>📡</span> 从链 B 读取接收记录
+                        </button>
+                        <div class="result-content" id="chainBReceiveInfo">
+                            <div class="empty-state">点击上方按钮读取链 B 接收记录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 链 B 元数据显示区块 -->
+            <div class="card" id="chainBMetadataCard" style="display: none;">
+                <div class="card-header">
+                    <h2>链 B 跨链桥元数据</h2>
+                    <span class="badge success">已从合约读取</span>
+                </div>
+                <div class="card-body">
+                    <div class="metadata-display" id="chainBMetadataDisplay">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 配置 - 从后端动态加载
+        let CONFIG = {};
+
+        // 状态
+        let issuedVcs = [];
+        let selectedVC = null;
+        let transferHistory = [];
+        let pollingInterval = null;
+
+        // VC 类型中文映射
+        const VC_TYPE_NAMES = {
+            'InspectionReport': '质检报告',
+            'InsuranceContract': '保险合同',
+            'CertificateOfOrigin': '原产地证书',
+            'BillOfLadingCertificate': '提单证书'
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadConfig();
+            setupEventListeners();
+            checkChainStatus();
+        });
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/vc-transfer/config');
+                const data = await response.json();
+                if (data.success) {
+                    CONFIG = data;
+                    displayVcManagers();
+                    displayBridgeInfo();
+                }
+            } catch (error) {
+                console.error('加载配置失败:', error);
+                showToast('加载配置失败', 'error');
+            }
+        }
+
+        // 设置事件监听
+        function setupEventListeners() {
+            // 刷新 VC 列表
+            document.getElementById('refreshVcsBtn').addEventListener('click', loadIssuedVcs);
+
+            // VC 类型过滤
+            document.getElementById('vcTypeFilter').addEventListener('change', filterVcList);
+
+            // 取消选择
+            document.getElementById('cancelSelectionBtn').addEventListener('click', cancelSelection);
+
+            // 发起跨链传输
+            document.getElementById('initiateTransferBtn').addEventListener('click', initiateTransfer);
+
+            // 从链 B 读取
+            document.getElementById('readFromChainBBtn').addEventListener('click', readFromChainB);
+        }
+
+        // 显示 VC 管理器列表
+        function displayVcManagers() {
+            const container = document.getElementById('vcManagerList');
+            const vcManagers = CONFIG.vc_managers || [];
+
+            if (vcManagers.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无 VC 管理器</div>';
+                return;
+            }
+
+            const icons = {
+                'InspectionReportVCManager': '📋',
+                'InsuranceContractVCManager': '🛡️',
+                'CertificateOfOriginVCManager': '📜',
+                'BillOfLadingVCManager': '📦'
+            };
+
+            container.innerHTML = vcManagers.map(vm => `
+                <div class="vc-manager-item" data-key="${vm.key}" data-address="${vm.address}">
+                    <div class="vc-icon">${icons[vm.key] || '📄'}</div>
+                    <div class="vc-info">
+                        <div class="vc-name">${vm.name || vm.key}</div>
+                        <div class="vc-desc" style="font-family: monospace; font-size: 0.65rem;">${vm.address ? vm.address.slice(0, 10) + '...' + vm.address.slice(-8) : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示跨链桥信息
+        function displayBridgeInfo() {
+            const container = document.getElementById('bridgeInfo');
+            const chainB = CONFIG.chains?.chain_b;
+
+            if (!chainB) {
+                container.innerHTML = '<div class="empty-state">暂无配置</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="info-row">
+                    <span class="info-label">合约名称</span>
+                    <span class="info-value">VCCrossChainBridge</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">合约地址</span>
+                    <span class="info-value hash">${chainB.bridge_address ? chainB.bridge_address.slice(0, 10) + '...' + chainB.bridge_address.slice(-8) : 'N/A'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">RPC URL</span>
+                    <span class="info-value">${chainB.rpc_url || 'N/A'}</span>
+                </div>
+            `;
+        }
+
+        // 加载已发行 VC 列表
+        async function loadIssuedVcs() {
+            showLoading('正在加载已发行 VC 列表...');
+            try {
+                const response = await fetch('/api/vc-transfer/issued-vcs');
+                const data = await response.json();
+
+                if (data.success) {
+                    issuedVcs = data.vcs || [];
+                    document.getElementById('vcCountBadge').textContent = `${data.total || 0} 个 VC`;
+                    document.getElementById('vcCountBadge').style.display = 'inline-block';
+                    document.getElementById('lastRefreshTime').textContent = `最后刷新：${new Date().toLocaleTimeString()}`;
+                    filterVcList();
+                    showToast(`成功加载 ${data.total} 个 VC`, 'success');
+                } else {
+                    showToast(data.error || '加载失败', 'error');
+                    document.getElementById('issuedVcGrid').innerHTML = '<div class="empty-state">加载失败：' + (data.error || '未知错误') + '</div>';
+                }
+            } catch (error) {
+                console.error('加载 VC 列表失败:', error);
+                showToast('加载 VC 列表失败：' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 过滤 VC 列表
+        function filterVcList() {
+            const filterType = document.getElementById('vcTypeFilter').value;
+            const container = document.getElementById('issuedVcGrid');
+
+            let filtered = issuedVcs;
+            if (filterType) {
+                filtered = issuedVcs.filter(vc => vc.vc_type === filterType);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无符合条件的 VC 记录</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(vc => {
+                const vcTypeName = VC_TYPE_NAMES[vc.vc_type] || vc.vc_type;
+                const shortHash = vc.vc_hash ? (vc.vc_hash.slice(0, 10) + '...' + vc.vc_hash.slice(-8)) : 'N/A';
+
+                return `
+                    <div class="vc-card" onclick="selectVC('${vc.uuid}')" style="cursor: pointer;">
+                        <div class="vc-card-header">
+                            <span class="vc-icon">${getVcTypeIcon(vc.vc_type)}</span>
+                            <span class="vc-name">${vcTypeName}</span>
+                        </div>
+                        <div class="vc-card-body">
+                            <div class="vc-hash">
+                                <span class="label">合约名:</span>
+                                <code>${vc.contract_name || 'N/A'}</code>
+                            </div>
+                            <div class="vc-hash">
+                                <span class="label">哈希:</span>
+                                <code>${shortHash}</code>
+                            </div>
+                            <div class="vc-detail">
+                                <span class="label">发行时间:</span>
+                                <span class="value">${formatTimestamp(vc.timestamp)}</span>
+                            </div>
+                            <div class="vc-detail">
+                                <span class="label">UUID:</span>
+                                <span class="value" style="font-family: monospace; font-size: 0.65rem;">${vc.uuid.slice(0, 8)}...${vc.uuid.slice(-8)}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm select-vc-btn" onclick="event.stopPropagation(); selectVC('${vc.uuid}')">
+                            选择此 VC
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 获取 VC 类型图标
+        function getVcTypeIcon(vcType) {
+            const icons = {
+                'InspectionReport': '📋',
+                'InsuranceContract': '🛡️',
+                'CertificateOfOrigin': '📜',
+                'BillOfLadingCertificate': '📦'
+            };
+            return icons[vcType] || '📄';
+        }
+
+        // 格式化时间戳
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '-';
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch {
+                return timestamp;
+            }
+        }
+
+        // 选择 VC
+        async function selectVC(uuid) {
+            const vc = issuedVcs.find(v => v.uuid === uuid);
+            if (!vc) {
+                showToast('未找到该 VC 记录', 'error');
+                return;
+            }
+
+            selectedVC = vc;
+            showLoading('正在获取 VC 元数据...');
+
+            try {
+                // 从链上获取元数据
+                const response = await fetch(`/api/vc-transfer/vc-metadata/${vc.vc_type}/${vc.vc_hash}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayVcMetadata(vc, data.metadata);
+                    showToast('成功获取 VC 元数据', 'success');
+                } else {
+                    // 元数据获取失败，显示基本信息
+                    displayVcMetadataBasic(vc);
+                    showToast('未能从链上获取元数据，显示基本信息', 'warning');
+                }
+            } catch (error) {
+                console.error('获取元数据失败:', error);
+                displayVcMetadataBasic(vc);
+                showToast('获取元数据失败：' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 显示 VC 元数据
+        function displayVcMetadata(vc, metadata) {
+            const container = document.getElementById('vcMetadataInfo');
+            container.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">VC 名称</span>
+                    <span class="info-value">${metadata.vc_name || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">VC 哈希</span>
+                    <span class="info-value"><code class="hash">${vc.vc_hash}</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">VC 类型</span>
+                    <span class="info-value">${VC_TYPE_NAMES[vc.vc_type] || vc.vc_type}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">持有人 DID</span>
+                    <span class="info-value"><code>${metadata.holder_did || '-'}</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">持有人 Endpoint</span>
+                    <span class="info-value">${metadata.holder_endpoint || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">过期时间</span>
+                    <span class="info-value">${metadata.expiry_time ? new Date(metadata.expiry_time * 1000).toLocaleString() : '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">发行时间</span>
+                    <span class="info-value">${formatTimestamp(vc.timestamp)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">合约名称</span>
+                    <span class="info-value">${vc.contract_name || '-'}</span>
+                </div>
+            `;
+
+            document.getElementById('vcMetadataCard').style.display = 'block';
+            document.getElementById('vcMetadataCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 显示 VC 元数据（基本信息）
+        function displayVcMetadataBasic(vc) {
+            const container = document.getElementById('vcMetadataInfo');
+            container.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">VC 类型</span>
+                    <span class="info-value">${VC_TYPE_NAMES[vc.vc_type] || vc.vc_type}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">VC 哈希</span>
+                    <span class="info-value"><code class="hash">${vc.vc_hash || 'N/A'}</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">合约名称</span>
+                    <span class="info-value">${vc.contract_name || 'N/A'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">发行时间</span>
+                    <span class="info-value">${formatTimestamp(vc.timestamp)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">TX Hash</span>
+                    <span class="info-value"><code class="hash">${vc.tx_hash || 'N/A'}</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">UUID</span>
+                    <span class="info-value" style="font-family: monospace; font-size: 0.65rem;">${vc.uuid}</span>
+                </div>
+            `;
+
+            document.getElementById('vcMetadataCard').style.display = 'block';
+            document.getElementById('vcMetadataCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 取消选择
+        function cancelSelection() {
+            selectedVC = null;
+            document.getElementById('vcMetadataCard').style.display = 'none';
+            document.getElementById('transferProgressCard').style.display = 'none';
+            document.getElementById('transferResultCard').style.display = 'none';
+            document.getElementById('chainBMetadataCard').style.display = 'none';
+        }
+
+        // 发起跨链传输
+        async function initiateTransfer() {
+            try {
+                if (!selectedVC) {
+                    showToast('请先选择一个 VC', 'error');
+                    return;
+                }
+
+                console.log('[跨链传输] 开始发起，selectedVC:', selectedVC);
+
+                // ========== 重置状态 ==========
+                if (window.currentPollInterval) {
+                    clearInterval(window.currentPollInterval);
+                    window.currentPollInterval = null;
+                }
+                if (window.currentPollTimeout) {
+                    clearTimeout(window.currentPollTimeout);
+                    window.currentPollTimeout = null;
+                }
+
+                // 重置 UI 状态
+                document.getElementById('transferProgressCard').style.display = 'block';
+                document.getElementById('transferResultCard').style.display = 'none';
+                document.getElementById('chainBMetadataCard').style.display = 'none';
+                // 重置传输状态为初始结构（必须包含 transferProgressInfo 子元素）
+                document.getElementById('transferStatus').innerHTML = `
+                    <div class="result-icon" style="animation: spin 1s linear infinite;">⏳</div>
+                    <div class="result-details">
+                        <div class="result-title">正在发起跨链传输...</div>
+                        <div class="result-data" id="transferProgressInfo"></div>
+                    </div>
+                `;
+                document.getElementById('chainBReceiveInfo').innerHTML = '<div class="empty-state">点击上方"从链 B 读取接收记录"按钮检查状态</div>';
+
+                // 滚动到传输进度区域
+                document.getElementById('transferProgressCard').scrollIntoView({ behavior: 'smooth' });
+
+                const progressInfo = document.getElementById('transferProgressInfo');
+                progressInfo.innerHTML = `
+                    <div class="data-row">
+                        <span>VC 哈希:</span>
+                        <code>${selectedVC.vc_hash}</code>
+                    </div>
+                    <div class="data-row">
+                        <span>VC 类型:</span>
+                        <span>${VC_TYPE_NAMES[selectedVC.vc_type] || selectedVC.vc_type}</span>
+                    </div>
+                    <div class="data-row">
+                        <span>目标链:</span>
+                        <span>Chain B</span>
+                    </div>
+                `;
+
+                showLoading('正在发起跨链传输...');
+
+                const response = await fetch('/api/vc-transfer/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vc_hash: selectedVC.vc_hash,
+                        vc_type: selectedVC.vc_type,
+                        target_chain: 'chain_b'
+                    })
+                });
+
+                const result = await response.json();
+                console.log('跨链传输结果:', result);
+
+                if (result.success) {
+                    // 传输成功，等待并验证
+                    await waitForCompletion(selectedVC.vc_hash);
+                } else {
+                    throw new Error(result.error || '跨链传输失败');
+                }
+            } catch (error) {
+                console.error('跨链传输失败:', error);
+                document.getElementById('transferStatus').innerHTML = `
+                    <div class="result-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--error-color);">✕</div>
+                    <div class="result-details">
+                        <div class="result-title" style="color: var(--error-color);">跨链传输失败</div>
+                        <div class="result-data">
+                            <div class="error-message">${error.message}</div>
+                        </div>
+                    </div>
+                `;
+                showToast('跨链传输失败：' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 等待跨链完成
+        async function waitForCompletion(vcHash) {
+            const statusElement = document.getElementById('transferStatus');
+            const progressInfo = document.getElementById('transferProgressInfo');
+
+            showLoading('正在等待跨链传输完成...');
+            progressInfo.innerHTML += `
+                <div class="data-row">
+                    <span>等待时间:</span>
+                    <span id="waitTime">0 秒</span>
+                </div>
+            `;
+
+            let elapsed = 0;
+            const maxWait = 120; // 最多等待 120 秒
+
+            // 轮询检查状态
+            const pollInterval = setInterval(async () => {
+                elapsed += 3;
+                const waitTimeElement = document.getElementById('waitTime');
+                if (waitTimeElement) {
+                    waitTimeElement.textContent = `${elapsed} 秒`;
+                }
+
+                try {
+                    const response = await fetch(`/api/vc-transfer/wait-for-completion/${vcHash}?timeout=3`);
+                    const result = await response.json();
+
+                    if (result.found) {
+                        clearInterval(pollInterval);
+                        clearTimeout(window.currentPollTimeout); // 清除超时定时器，防止成功后仍然触发超时
+                        displayTransferSuccess(result);
+                    } else if (elapsed >= maxWait) {
+                        clearInterval(pollInterval);
+                        displayTransferTimeout(result);
+                    }
+                } catch (error) {
+                    console.error('轮询状态失败:', error);
+                }
+            }, 3000);
+
+            // 超时处理 - 保存引用以便在成功时清除
+            window.currentPollTimeout = setTimeout(() => {
+                clearInterval(pollInterval);
+                displayTransferTimeout();
+            }, maxWait * 1000);
+        }
+
+        // 显示传输成功
+        function displayTransferSuccess(result) {
+            hideLoading();
+
+            const statusElement = document.getElementById('transferStatus');
+            statusElement.innerHTML = `
+                <div class="result-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success-color);">✓</div>
+                <div class="result-details">
+                    <div class="result-title" style="color: var(--success-color);">跨链传输成功!</div>
+                    <div class="result-data">
+                        <div class="data-row">
+                            <span>耗时:</span>
+                            <span>${result.elapsed_time?.toFixed(1) || 'N/A'} 秒</span>
+                        </div>
+                        <div class="data-row">
+                            <span>检查次数:</span>
+                            <span>${result.check_count || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 显示传输结果卡片
+            document.getElementById('transferResultCard').style.display = 'block';
+            document.getElementById('chainATransferInfo').innerHTML = `
+                <div class="result-item success">
+                    <div class="result-icon">✓</div>
+                    <div class="result-details">
+                        <div class="result-title">链 A 传输成功</div>
+                        <div class="result-data">
+                            <div class="data-row">
+                                <span>VC 名称:</span>
+                                <span>${result.record?.vc_name || selectedVC?.contract_name || 'N/A'}</span>
+                            </div>
+                            <div class="data-row">
+                                <span>源链:</span>
+                                <code>${result.record?.source_chain || 'Chain A'}</code>
+                            </div>
+                            <div class="data-row">
+                                <span>接收时间:</span>
+                                <span>${result.record?.timestamp ? new Date(result.record.timestamp * 1000).toLocaleString() : 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 添加到历史记录
+            addTransferHistory({
+                vcName: result.record?.vc_name || selectedVC?.contract_name,
+                vcHash: selectedVC?.vc_hash,
+                timestamp: new Date().toLocaleString(),
+                status: 'success'
+            });
+
+            document.getElementById('transferResultCard').scrollIntoView({ behavior: 'smooth' });
+            showToast('跨链传输成功!', 'success');
+        }
+
+        // 显示传输超时
+        function displayTransferTimeout() {
+            hideLoading();
+
+            const statusElement = document.getElementById('transferStatus');
+            statusElement.innerHTML = `
+                <div class="result-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning-color);">⏱</div>
+                <div class="result-details">
+                    <div class="result-title" style="color: var(--warning-color);">等待超时</div>
+                    <div class="result-data">
+                        <div class="info-text">跨链传输可能仍在进行中，请稍后点击"从链 B 读取接收记录"手动检查状态。</div>
+                    </div>
+                </div>
+            `;
+
+            // 仍显示结果卡片
+            document.getElementById('transferResultCard').style.display = 'block';
+            document.getElementById('chainATransferInfo').innerHTML = `
+                <div class="result-item" style="border-left-color: var(--warning-color);">
+                    <div class="result-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning-color);">⏱</div>
+                    <div class="result-details">
+                        <div class="result-title">等待超时</div>
+                        <div class="result-data">
+                            <div class="info-text">跨链传输可能仍在进行中，请点击下方"从链 B 读取接收记录"按钮检查状态。</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('transferResultCard').scrollIntoView({ behavior: 'smooth' });
+            showToast('等待超时，请手动检查链 B 状态', 'warning');
+        }
+
+        // 从链 B 读取接收记录
+        async function readFromChainB() {
+            if (!selectedVC) {
+                showToast('没有可读取的 VC', 'error');
+                return;
+            }
+
+            showLoading('正在从链 B 读取接收记录...');
+            try {
+                const response = await fetch(`/api/vc-transfer/bridge-record/${selectedVC.vc_hash}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.found) {
+                        displayChainBMetadata(result.record);
+                        showToast('成功从链 B 读取元数据', 'success');
+                    } else {
+                        document.getElementById('chainBReceiveInfo').innerHTML = `
+                            <div class="empty-state">链 B 暂未收到该 VC，请稍后重试</div>
+                        `;
+                        showToast('链 B 尚未收到 VC，请稍后重试', 'warning');
+                    }
+                } else {
+                    throw new Error(result.error || '读取失败');
+                }
+            } catch (error) {
+                console.error('读取链 B 数据失败:', error);
+                document.getElementById('chainBReceiveInfo').innerHTML = `
+                    <div class="error-message">读取失败：${error.message}</div>
+                `;
+                showToast('读取链 B 数据失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 显示链 B 元数据
+        function displayChainBMetadata(record) {
+            const chainBInfo = document.getElementById('chainBReceiveInfo');
+            chainBInfo.innerHTML = `
+                <div class="result-item success">
+                    <div class="result-icon">✓</div>
+                    <div class="result-details">
+                        <div class="result-title">链 B 已接收</div>
+                        <div class="result-data">
+                            <div class="data-row">
+                                <span>VC 名称:</span>
+                                <span>${record.vc_name || '-'}</span>
+                            </div>
+                            <div class="data-row">
+                                <span>源链:</span>
+                                <code>${record.source_chain || '-'}</code>
+                            </div>
+                            <div class="data-row">
+                                <span>接收时间:</span>
+                                <span>${record.timestamp > 0 ? new Date(record.timestamp * 1000).toLocaleString() : '-'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 显示完整的元数据卡片
+            document.getElementById('chainBMetadataCard').style.display = 'block';
+            const metadataDisplay = document.getElementById('chainBMetadataDisplay');
+            metadataDisplay.innerHTML = `
+                <div class="metadata-section">
+                    <h4>VC 基本信息</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">VC 名称</span>
+                            <span class="info-value">${record.vc_name || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">源链</span>
+                            <span class="info-value">${record.source_chain || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metadata-section">
+                    <h4>持有人信息</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">持有人 DID</span>
+                            <span class="info-value"><code>${record.holder_did || '-'}</code></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">持有人 Endpoint</span>
+                            <span class="info-value">${record.holder_endpoint || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metadata-section">
+                    <h4>传输信息</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">接收时间戳</span>
+                            <span class="info-value">${record.timestamp || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">接收时间</span>
+                            <span class="info-value">${record.timestamp > 0 ? new Date(record.timestamp * 1000).toLocaleString() : '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metadata-section verify">
+                    <div class="verify-badge">
+                        <span class="verify-icon">🔐</span>
+                        <span>数据来源：链 B 跨链桥合约</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('chainBMetadataCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 添加传输历史
+        function addTransferHistory(item) {
+            transferHistory.unshift(item);
+            updateHistoryDisplay();
+        }
+
+        // 更新历史显示
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('transferHistory');
+
+            if (transferHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">暂无传输记录</div>';
+                return;
+            }
+
+            historyList.innerHTML = transferHistory.slice(0, 10).map(item => `
+                <div class="history-item">
+                    <span class="history-icon">${item.status === 'success' ? '✓' : '✕'}</span>
+                    <div class="history-info">
+                        <div class="history-name">${item.vcName || '未命名 VC'}</div>
+                        <div class="history-time">${item.timestamp}</div>
+                    </div>
+                    <span class="history-status ${item.status}">
+                        ${item.status === 'success' ? '成功' : '失败'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // 检查链状态
+        async function checkChainStatus() {
+            // 简化检查，通过 API 获取配置即视为可用
+            if (CONFIG.chains) {
+                setChainStatus('chainAStatus', true);
+                setChainStatus('chainBStatus', true);
+            }
+        }
+
+        function setChainStatus(elementId, connected) {
+            const dot = document.getElementById(elementId);
+            if (dot) {
+                dot.className = 'status-dot ' + (connected ? 'success' : 'error');
+            }
+        }
+
+        // 显示加载
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        // 隐藏加载
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // 显示 Toast
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

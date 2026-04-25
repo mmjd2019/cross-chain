@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能合约状态查看器 - 跨链VC系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contract_viewer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link">← 返回主页</a>
+                    <h1>🔍 智能合约状态查看器</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">检查中...</span>
+                    </div>
+                    <button class="btn btn-primary" id="refreshBtn" onclick="refreshData()">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">刷新数据</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-container">
+            <!-- 左侧导航栏 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>合约列表</h2>
+                </div>
+                <div class="chain-section" id="chainASection">
+                    <h3 class="chain-title">Chain A (源链)</h3>
+                    <div class="contract-list" id="chainAContracts"></div>
+                </div>
+                <div class="chain-section" id="chainBSection">
+                    <h3 class="chain-title">Chain B (目标链)</h3>
+                    <div class="contract-list" id="chainBContracts"></div>
+                </div>
+            </aside>
+
+            <!-- 右侧内容区 -->
+            <main class="content">
+                <!-- 概览卡片 -->
+                <div class="summary-cards" id="summaryCards"></div>
+
+                <!-- 合约详情 -->
+                <div class="contract-detail" id="contractDetail">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">📋</div>
+                        <h2>请从左侧选择一个合约</h2>
+                        <p>点击合约名称查看其 public 变量和 mapping 数据</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>正在读取合约数据...</p>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentData = null;
+        let statusCheckInterval = null;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSummary();
+            startStatusCheck();
+        });
+
+        // 加载摘要数据
+        async function loadSummary() {
+            try {
+                const response = await fetch('/api/contract-viewer/summary');
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast('error', '无法加载数据: ' + data.error);
+                    return;
+                }
+
+                currentData = data;
+                renderSidebar(data);
+                renderSummary(data.summary);
+            } catch (error) {
+                showToast('error', '加载失败: ' + error.message);
+            }
+        }
+
+        // 渲染侧边栏
+        function renderSidebar(data) {
+            const chainAContainer = document.getElementById('chainAContracts');
+            const chainBContainer = document.getElementById('chainBContracts');
+
+            chainAContainer.innerHTML = '';
+            chainBContainer.innerHTML = '';
+
+            for (const [chainName, chainData] of Object.entries(data.chains)) {
+                const container = chainName === 'chain_a' ? chainAContainer : chainBContainer;
+
+                chainData.contracts.forEach(contract => {
+                    const div = document.createElement('div');
+                    div.className = 'contract-item';
+                    div.innerHTML = `
+                        <div class="contract-name">${contract.name}</div>
+                        <div class="contract-address">${formatAddress(contract.address)}</div>
+                        <div class="contract-stats">
+                            <span class="stat">📊 ${contract.simple_vars_count}</span>
+                            <span class="stat">🗂️ ${contract.mappings_count}</span>
+                        </div>
+                    `;
+                    div.onclick = () => loadContractDetail(chainName, contract.name);
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        // 渲染摘要卡片
+        function renderSummary(summary) {
+            const container = document.getElementById('summaryCards');
+            container.innerHTML = `
+                <div class="summary-card">
+                    <div class="card-icon">📜</div>
+                    <div class="card-content">
+                        <div class="card-label">总合约数</div>
+                        <div class="card-value">${summary.total_contracts || 0}</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">🔢</div>
+                    <div class="card-content">
+                        <div class="card-label">简单变量</div>
+                        <div class="card-value">${summary.total_simple_variables || 0}</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">🗺️</div>
+                    <div class="card-content">
+                        <div class="card-label">Mapping 数量</div>
+                        <div class="card-value">${summary.total_mappings || 0}</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-content">
+                        <div class="card-label">Mapping 条目</div>
+                        <div class="card-value">${(summary.total_non_empty_entries || 0) + ' / ' + (summary.total_mapping_entries || 0)}</div>
+                        <div class="card-sublabel">非空 / 总计</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 加载合约详情
+        async function loadContractDetail(chainName, contractName) {
+            showLoading(true);
+
+            try {
+                const response = await fetch(`/api/contract-viewer/contract/${chainName}/${contractName}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast('error', data.error);
+                    return;
+                }
+
+                renderContractDetail(data);
+            } catch (error) {
+                showToast('error', '加载失败: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 渲染合约详情
+        function renderContractDetail(contract) {
+            const container = document.getElementById('contractDetail');
+
+            let html = `
+                <div class="contract-header">
+                    <div class="contract-title">
+                        <h2>${contract.contract_name}</h2>
+                        <span class="contract-chain">${contract.chain}</span>
+                    </div>
+                    <div class="contract-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">地址</span>
+                            <span class="meta-value">${formatAddress(contract.address)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 简单变量部分
+            const simpleVars = Object.entries(contract.simple_variables || {});
+            if (simpleVars.length > 0) {
+                html += `
+                    <section class="section">
+                        <h3 class="section-title">📌 简单变量 (${simpleVars.length})</h3>
+                        <div class="simple-vars-grid">
+                `;
+                simpleVars.forEach(([name, data]) => {
+                    const value = data.value;
+                    html += `
+                        <div class="simple-var-card ${data.status}">
+                            <div class="var-name">${name}</div>
+                            <div class="var-value">${formatValue(value)}</div>
+                        </div>
+                    `;
+                });
+                html += `
+                        </div>
+                    </section>
+                `;
+            }
+
+            // Mapping 部分
+            const mappings = Object.entries(contract.mappings || {});
+            if (mappings.length > 0) {
+                html += `
+                    <section class="section">
+                        <h3 class="section-title">🗺️ Mapping (${mappings.length})</h3>
+                `;
+                mappings.forEach(([name, data]) => {
+                    const entries = (data.all_entries || []).filter(e => !e.is_empty);
+                    if (entries.length > 0) {
+                        html += `
+                            <div class="mapping-section">
+                                <h4 class="mapping-name">${name}</h4>
+                                <div class="mapping-info">
+                                    <span>键类型: ${data.key_type || 'unknown'}</span>
+                                    <span>非空条目: ${data.non_empty_results || 0} / ${data.total_results || 0}</span>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="mapping-table">
+                                        <thead>
+                                            <tr>
+                                                <th>键 (Key)</th>
+                                                <th>值 (Value)</th>
+                                                <th>类型</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                `;
+                        entries.forEach(entry => {
+                            html += `
+                                <tr>
+                                    <td class="key-cell"><code>${formatKey(entry.key)}</code></td>
+                                    <td class="value-cell">${formatValue(entry.value)}</td>
+                                    <td class="type-cell">${entry.raw_type || 'unknown'}</td>
+                                </tr>
+                            `;
+                        });
+                        html += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                html += `
+                    </section>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 刷新数据
+        async function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            if (btn.disabled) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-icon spinning">🔄</span><span class="btn-text">刷新中...</span>';
+
+            try {
+                const response = await fetch('/api/contract-viewer/refresh', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', '刷新任务已启动，请稍候...');
+                    setTimeout(() => { loadSummary(); }, 5000);
+                } else {
+                    showToast('error', result.message);
+                }
+            } catch (error) {
+                showToast('error', '刷新失败: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">刷新数据</span>';
+            }
+        }
+
+        // 状态检查
+        function startStatusCheck() {
+            checkStatus();
+            statusCheckInterval = setInterval(checkStatus, 3000);
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/contract-viewer/status');
+                const data = await response.json();
+                updateStatusIndicator(data);
+            } catch (error) {
+                console.error('Status check failed:', error);
+            }
+        }
+
+        function updateStatusIndicator(data) {
+            const indicator = document.getElementById('statusIndicator');
+            const dot = indicator.querySelector('.status-dot');
+            const text = indicator.querySelector('.status-text');
+
+            if (data.is_running) {
+                dot.className = 'status-dot running';
+                text.textContent = '刷新中...';
+            } else if (data.last_success) {
+                dot.className = 'status-dot success';
+                const time = new Date(data.last_success);
+                text.textContent = '已更新 ' + formatTime(time);
+            } else {
+                dot.className = 'status-dot error';
+                text.textContent = '暂无数据';
+            }
+        }
+
+        // 工具函数
+        function formatAddress(addr) {
+            if (!addr || addr === 'unknown') return 'N/A';
+            if (addr.startsWith('0x')) {
+                return addr.slice(0, 6) + '...' + addr.slice(-4);
+            }
+            return addr;
+        }
+
+        function formatValue(value) {
+            if (value === null || value === undefined) return '<span class="empty">空</span>';
+            if (typeof value === 'boolean') return value ? '<span class="bool-true">true</span>' : '<span class="bool-false">false</span>';
+            if (typeof value === 'object') return JSON.stringify(value);
+            if (typeof value === 'string') {
+                if (value.startsWith('0x') && value.length > 20) {
+                    return '<code>' + value.slice(0, 10) + '...' + value.slice(-8) + '</code>';
+                }
+                if (value.length > 50) {
+                    return '<code>' + value.slice(0, 30) + '...' + value.slice(-15) + '</code>';
+                }
+                return '<code>' + value + '</code>';
+            }
+            return String(value);
+        }
+
+        function formatKey(key) {
+            if (!key) return 'N/A';
+            if (key.startsWith('0x') && key.length > 20) {
+                return key.slice(0, 10) + '...' + key.slice(-8);
+            }
+            if (key.length > 30) {
+                return key.slice(0, 20) + '...' + key.slice(-10);
+            }
+            return key;
+        }
+
+        function formatTime(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return diff + '秒前';
+            if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+            return date.toLocaleString('zh-CN');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            toast.style.display = 'block';
+
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+    </script>
+</body>
+</html>

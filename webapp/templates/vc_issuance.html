@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC发行服务 - 跨链VC系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vc_issuance.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link">← 返回主页</a>
+                    <h1>🎫 VC发行服务</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="status-indicator" id="acapyStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">连接检查中...</span>
+                    </div>
+                    <div class="status-indicator" id="oracleStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Oracle检查中...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-container">
+            <!-- 左侧VC类型选择 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>VC类型</h2>
+                </div>
+
+                <div class="vc-type-list">
+                    <div class="vc-type-item" data-type="InspectionReport" onclick="selectVCType('InspectionReport')">
+                        <div class="vc-icon">📋</div>
+                        <div class="vc-info">
+                            <div class="vc-name">质检报告</div>
+                            <div class="vc-desc">InspectionReport</div>
+                        </div>
+                    </div>
+                    <div class="vc-type-item" data-type="InsuranceContract" onclick="selectVCType('InsuranceContract')">
+                        <div class="vc-icon">🛡️</div>
+                        <div class="vc-info">
+                            <div class="vc-name">保险合同</div>
+                            <div class="vc-desc">InsuranceContract</div>
+                        </div>
+                    </div>
+                    <div class="vc-type-item" data-type="CertificateOfOrigin" onclick="selectVCType('CertificateOfOrigin')">
+                        <div class="vc-icon">📜</div>
+                        <div class="vc-info">
+                            <div class="vc-name">原产地证明</div>
+                            <div class="vc-desc">CertificateOfOrigin</div>
+                        </div>
+                    </div>
+                    <div class="vc-type-item" data-type="BillOfLadingCertificate" onclick="selectVCType('BillOfLadingCertificate')">
+                        <div class="vc-icon">🚢</div>
+                        <div class="vc-info">
+                            <div class="vc-name">提单</div>
+                            <div class="vc-desc">BillOfLadingCertificate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 发行历史 -->
+                <div class="sidebar-section">
+                    <h3>最近发行</h3>
+                    <div class="history-list" id="recentIssuance">
+                        <div class="empty-state">暂无发行记录</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右侧内容区 -->
+            <main class="content">
+                <!-- VC类型信息卡片 -->
+                <div class="vc-type-card" id="vcTypeCard">
+                    <div class="card-header">
+                        <h2 id="vcTitle">请选择VC类型</h2>
+                        <span class="vc-badge" id="vcBadge" style="display: none;">7个属性</span>
+                    </div>
+                    <div class="card-body">
+                        <p id="vcDescription">请从左侧选择要发行的VC类型</p>
+                    </div>
+                </div>
+
+                <!-- VC属性表单 -->
+                <div class="form-section" id="formSection" style="display: none;">
+                    <div class="form-header">
+                        <h3>填写VC属性</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">
+                            📝 填入示例数据
+                        </button>
+                    </div>
+                    <form id="vcForm" class="vc-form">
+                        <div id="formFields"></div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-icon">✨</span>
+                                <span>发行VC</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <span class="btn-icon">🔄</span>
+                                <span>重置</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 发行结果 -->
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <div class="result-header">
+                        <h3>发行结果</h3>
+                        <div class="result-header-controls">
+                            <button class="btn btn-secondary btn-sm" id="refreshBtn" onclick="refreshVCData()" style="display: none;">
+                                <span class="btn-icon">🔄</span>
+                                <span>刷新数据</span>
+                            </button>
+                            <div class="result-status" id="resultStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- Holder中的VC -->
+                    <div class="result-card" id="holderVCCard">
+                        <h4>📱 Holder中的VC</h4>
+                        <div class="result-content" id="holderVCContent"></div>
+                    </div>
+
+                    <!-- 链上VC Hash -->
+                    <div class="result-card" id="chainHashCard">
+                        <h4>🔗 链上VC Hash</h4>
+                        <div class="result-content" id="chainHashContent"></div>
+                    </div>
+
+                    <!-- 链上元数据 -->
+                    <div class="result-card" id="chainMetadataCard">
+                        <h4>📋 链上元数据</h4>
+                        <div class="result-content" id="chainMetadataContent"></div>
+                    </div>
+
+                    <!-- 交易信息 -->
+                    <div class="result-card" id="txInfoCard">
+                        <h4>💳 交易信息</h4>
+                        <div class="result-content" id="txInfoContent"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">正在发行VC...</p>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // VC类型配置
+        const VC_TYPES = {
+            'InspectionReport': {
+                name: '质检报告',
+                icon: '📋',
+                description: '产品质量检验证书，包含检验结果和产品信息',
+                credDefId: 'DPvobytTtKvmyeRTJZYjsg:3:CL:762:InspectionReport_V8',
+                contractAddress: '0xf5573AA77552858d70384FCAC615EeDb4e05Ba7B',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: '例如: ABC Export Co.' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: '例如: CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '例如: 工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '例如: 1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: '例如: BATCH-2024-001' },
+                    { name: 'inspectionPassed', label: '检验通过', type: 'select', options: ['true', 'false'] },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'InsuranceContract': {
+                name: '保险合同',
+                icon: '🛡️',
+                description: '货物保险证明，涵盖保险金额和保险公司信息',
+                credDefId: 'DPvobytTtKvmyeRTJZYjsg:3:CL:782:InsuranceContract_V8',
+                contractAddress: '0xC1e2E535D3979F868455A82D208EfABdC3174aa5',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: '例如: ABC Export Co.' },
+                    { name: 'importer', label: '进口商', type: 'text', placeholder: '例如: XYZ Import Inc.' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: '例如: CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '例如: 工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '例如: 1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: '例如: BATCH-2024-001' },
+                    { name: 'insuranceAmount', label: '保险金额', type: 'number', placeholder: '例如: 100000' },
+                    { name: 'insuranceCompany', label: '保险公司', type: 'text', placeholder: '例如: Safe Insurance Co.' },
+                    { name: 'isInsured', label: '已投保', type: 'select', options: ['true', 'false'] },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'CertificateOfOrigin': {
+                name: '原产地证明',
+                icon: '📜',
+                description: '证明货物原产地的官方证书',
+                credDefId: 'DPvobytTtKvmyeRTJZYjsg:3:CL:784:CertificateOfOrigin_V8',
+                contractAddress: '0x8499286b6d3B9c4b9c15A8A855a8B4839026fD7C',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: '例如: ABC Export Co.' },
+                    { name: 'importer', label: '进口商', type: 'text', placeholder: '例如: XYZ Import Inc.' },
+                    { name: 'certifier', label: '认证机构', type: 'text', placeholder: '例如: Quality Cert Authority' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: '例如: CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '例如: 工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '例如: 1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: '例如: BATCH-2024-001' },
+                    { name: 'placeOfOrigin', label: '原产地', type: 'text', placeholder: '例如: 中国上海' },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'BillOfLadingCertificate': {
+                name: '提单',
+                icon: '🚢',
+                description: '海运提单证书，证明货物运输合同和货物接收',
+                credDefId: 'DPvobytTtKvmyeRTJZYjsg:3:CL:786:BillOfLadingCertificate_V8',
+                contractAddress: '0xA9a4074B2A92E63e4c7DC440E80ea1f76a28F701',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: '例如: ABC Export Co.' },
+                    { name: 'shippingCompany', label: '船运公司', type: 'text', placeholder: '例如: Global Shipping Lines' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: '例如: CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '例如: 工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '例如: 1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: '例如: BATCH-2024-001' },
+                    { name: 'portOfDeparture', label: '装货港', type: 'text', placeholder: '例如: 上海港' },
+                    { name: 'portOfArrival', label: '卸货港', type: 'text', placeholder: '例如: 洛杉矶港' },
+                    { name: 'departureDate', label: '出发日期', type: 'date' },
+                    { name: 'scheduledArrivalDate', label: '预计到达日期', type: 'date' }
+                ]
+            }
+        };
+
+        let currentVCType = null;
+        let issuanceHistory = [];
+        let currentIssuanceResult = null;  // 保存当前发行结果，用于刷新
+
+        // 从后端动态加载VC配置（cred_def_id和contract_address）
+        async function loadVCConfig() {
+            try {
+                const response = await fetch('/api/vc-issuance/vc-types-config');
+                const data = await response.json();
+                if (data.success && data.vc_types) {
+                    // 更新VC_TYPES中的配置
+                    for (const [vcType, config] of Object.entries(data.vc_types)) {
+                        if (VC_TYPES[vcType]) {
+                            VC_TYPES[vcType].credDefId = config.cred_def_id;
+                            VC_TYPES[vcType].contractAddress = config.contract_address;
+                        }
+                    }
+                    console.log('VC配置已从后端同步:', data.vc_types);
+                }
+            } catch (error) {
+                console.warn('加载VC配置失败，使用默认配置:', error);
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 先加载VC配置，确保使用最新的cred_def_id
+            await loadVCConfig();
+            checkOracleStatus();
+            checkAcaPyConnectionStatus();
+            loadIssuanceHistory();
+            // 每30秒更新一次连接状态
+            setInterval(checkAcaPyConnectionStatus, 30000);
+        });
+
+        // 选择VC类型
+        function selectVCType(vcType) {
+            currentVCType = vcType;
+            const config = VC_TYPES[vcType];
+
+            // 高亮选中项
+            document.querySelectorAll('.vc-type-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.vc-type-item[data-type="${vcType}"]`).classList.add('active');
+
+            // 更新信息卡片
+            document.getElementById('vcTitle').textContent = `${config.icon} ${config.name}`;
+            document.getElementById('vcBadge').textContent = `${config.attributes.length}个属性`;
+            document.getElementById('vcBadge').style.display = 'inline';
+            document.getElementById('vcDescription').textContent = config.description;
+
+            // 显示表单
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+
+            // 生成表单字段
+            generateFormFields(config.attributes);
+        }
+
+        // 生成表单字段
+        function generateFormFields(attributes) {
+            const formFields = document.getElementById('formFields');
+            formFields.innerHTML = '';
+
+            attributes.forEach(attr => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'form-field';
+
+                const label = document.createElement('label');
+                label.className = 'form-label';
+                label.textContent = attr.label;
+                label.setAttribute('for', attr.name);
+
+                let input;
+                if (attr.type === 'select') {
+                    input = document.createElement('select');
+                    input.className = 'form-select';
+                    input.id = attr.name;
+                    input.name = attr.name;
+                    input.required = true;
+
+                    attr.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt === 'true' ? '是' : (opt === 'false' ? '否' : opt);
+                        input.appendChild(option);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = attr.type;
+                    input.className = 'form-input';
+                    input.id = attr.name;
+                    input.name = attr.name;
+                    input.placeholder = attr.placeholder || '';
+                    if (attr.type !== 'date') {
+                        input.required = true;
+                    }
+                }
+
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(input);
+                formFields.appendChild(fieldDiv);
+            });
+        }
+
+        // 填入示例数据
+        function loadSampleData() {
+            if (!currentVCType) {
+                showToast('error', '请先选择VC类型');
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const sampleData = {
+                'InspectionReport': {
+                    exporter: 'ABC Export Co.',
+                    contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100',
+                    productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001',
+                    inspectionPassed: 'true',
+                    Date: today
+                },
+                'InsuranceContract': {
+                    exporter: 'ABC Export Co.',
+                    importer: 'XYZ Import Inc.',
+                    contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100',
+                    productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001',
+                    insuranceAmount: '100000',
+                    insuranceCompany: 'Safe Insurance Co.',
+                    isInsured: 'true',
+                    Date: today
+                },
+                'CertificateOfOrigin': {
+                    exporter: 'ABC Export Co.',
+                    importer: 'XYZ Import Inc.',
+                    certifier: 'Quality Cert Authority',
+                    contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100',
+                    productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001',
+                    placeOfOrigin: '中国上海',
+                    Date: today
+                },
+                'BillOfLadingCertificate': {
+                    exporter: 'ABC Export Co.',
+                    shippingCompany: 'Global Shipping Lines',
+                    contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100',
+                    productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001',
+                    portOfDeparture: '上海港',
+                    portOfArrival: '洛杉矶港',
+                    departureDate: today,
+                    scheduledArrivalDate: today
+                }
+            };
+
+            const data = sampleData[currentVCType];
+            for (const [key, value] of Object.entries(data)) {
+                const input = document.getElementById(key);
+                if (input) {
+                    input.value = value;
+                }
+            }
+
+            showToast('success', '已填入示例数据');
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('vcForm').reset();
+        }
+
+        // 表单提交处理
+        document.getElementById('vcForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!currentVCType) {
+                showToast('error', '请先选择VC类型');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const vcData = {};
+            for (const [key, value] of formData.entries()) {
+                vcData[key] = value;
+            }
+
+            await issueVC(currentVCType, vcData);
+        });
+
+        // 发行VC
+        async function issueVC(vcType, vcData) {
+            showLoading(true, '正在发行VC，请稍候...');
+
+            try {
+                const response = await fetch('/api/vc-issuance/issue', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vc_type: vcType,
+                        attributes: vcData
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', 'VC发行成功！');
+                    displayResult(result);
+                    addToHistory(vcType, vcData, result);
+                } else {
+                    showToast('error', 'VC发行失败: ' + (result.error || '未知错误'));
+                    displayError(result);
+                }
+            } catch (error) {
+                showToast('error', '发行失败: ' + error.message);
+                displayError({
+                    error: error.message,
+                    error_type: 'network_error'
+                });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 显示结果
+        function displayResult(result) {
+            // 保存当前发行结果
+            currentIssuanceResult = result;
+
+            document.getElementById('resultSection').style.display = 'block';
+
+            // 显示刷新按钮
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (result.success && result.chain_data?.vc_hash) {
+                refreshBtn.style.display = 'inline-flex';
+            } else {
+                refreshBtn.style.display = 'none';
+            }
+
+            // 状态
+            const statusDiv = document.getElementById('resultStatus');
+            statusDiv.className = 'result-status success';
+            statusDiv.innerHTML = '<span class="status-icon">✅</span><span>发行成功</span>';
+
+            // Holder中的VC
+            const holderVCContent = document.getElementById('holderVCContent');
+            if (result.holder_vc) {
+                const vc = result.holder_vc;
+                let holderItems = '';
+                if (vc.id) {
+                    holderItems += `<div class="info-item">
+                        <span class="info-label">VC ID:</span>
+                        <span class="info-value"><code>${formatID(vc.id)}</code></span>
+                    </div>`;
+                }
+                if (vc.schema_id) {
+                    holderItems += `<div class="info-item">
+                        <span class="info-label">Schema ID:</span>
+                        <span class="info-value"><code>${formatID(vc.schema_id)}</code></span>
+                    </div>`;
+                }
+                if (vc.cred_def_id) {
+                    holderItems += `<div class="info-item">
+                        <span class="info-label">Cred Def ID:</span>
+                        <span class="info-value"><code>${formatID(vc.cred_def_id)}</code></span>
+                    </div>`;
+                }
+                if (vc.rev_reg_id) {
+                    holderItems += `<div class="info-item">
+                        <span class="info-label">Revocation ID:</span>
+                        <span class="info-value"><code>${vc.rev_reg_id}</code></span>
+                    </div>`;
+                }
+                holderVCContent.innerHTML = `
+                    <div class="info-grid">${holderItems}</div>
+                    <div class="vc-attributes">
+                        <h5>VC属性:</h5>
+                        ${renderAttributes(vc.attributes || {})}
+                    </div>
+                `;
+            } else {
+                holderVCContent.innerHTML = '<div class="empty-state">暂无数据</div>';
+            }
+
+            // 链上VC Hash（包含UUID）
+            const chainHashContent = document.getElementById('chainHashContent');
+            if (result.chain_data && result.chain_data.vc_hash) {
+                // 优先使用已提取的chain_uuid（从刷新API返回），否则从vcName中提取
+                let chain_uuid = result.chain_uuid || null;
+                if (!chain_uuid && result.chain_data.metadata && result.chain_data.metadata.vc_name) {
+                    const vcName = result.chain_data.metadata.vc_name;
+                    const uuidMatch = vcName.match(/UUID:\s*([a-f0-9\-]{36})/i);
+                    if (uuidMatch) {
+                        chain_uuid = uuidMatch[1];
+                    }
+                }
+
+                chainHashContent.innerHTML = `
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">VC Hash:</span>
+                            <span class="info-value"><code class="hash">${result.chain_data.vc_hash}</code></span>
+                        </div>
+                        ${chain_uuid ? `
+                        <div class="info-item">
+                            <span class="info-label">UUID (contractName):</span>
+                            <span class="info-value"><code class="uuid">${chain_uuid}</code></span>
+                        </div>
+                        ` : '<div class="info-item"><span class="info-label">UUID:</span><span class="info-value text-muted">点击刷新获取</span></div>'}
+                        <div class="info-item">
+                            <span class="info-label">合约地址:</span>
+                            <span class="info-value"><code>${formatAddress(result.chain_data.contract_address)}</code></span>
+                        </div>
+                        ${result.chain_data.block_number ? `<div class="info-item">
+                            <span class="info-label">区块号:</span>
+                            <span class="info-value">${result.chain_data.block_number}</span>
+                        </div>` : ''}
+                    </div>
+                `;
+            } else {
+                chainHashContent.innerHTML = '<div class="empty-state">暂无数据</div>';
+            }
+
+            // 链上元数据（支持两种格式：发行时的metadata和刷新后的chain_metadata）
+            const chainMetadataContent = document.getElementById('chainMetadataContent');
+            if (result.chain_data && (result.chain_data.metadata || result.chain_metadata)) {
+                // 优先使用刷新后的chain_metadata（从链上获取），否则使用发行时的metadata
+                const metadata = result.chain_metadata || result.chain_data.metadata;
+
+                // 兼容两种命名格式：snake_case（链上返回）和camelCase（发行时）
+                const vcName = metadata.vc_name || metadata.vcName || 'N/A';
+                const vcDescription = metadata.vc_description || metadata.vcDescription || 'N/A';
+                const issuerDid = metadata.issuer_did || metadata.issuer_did || 'N/A';
+                const holderDid = metadata.holder_did || metadata.holder_did || 'N/A';
+                const blockchainEndpoint = metadata.blockchain_endpoint || metadata.blockchainEndpoint || 'N/A';
+                const blockchainType = metadata.blockchain_type || metadata.blockchainType || 'N/A';
+                const expiryTime = metadata.expiry_time || metadata.expiryTime || 'N/A';
+
+                chainMetadataContent.innerHTML = `
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">VC名称:</span>
+                            <span class="info-value">${vcName}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">VC描述:</span>
+                            <span class="info-value">${vcDescription}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">发行者DID:</span>
+                            <span class="info-value"><code>${formatDID(issuerDid)}</code></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">持有者DID:</span>
+                            <span class="info-value"><code>${formatDID(holderDid)}</code></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">区块链:</span>
+                            <span class="info-value">${blockchainType}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">过期时间:</span>
+                            <span class="info-value">${expiryTime}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                chainMetadataContent.innerHTML = '<div class="empty-state">暂无数据</div>';
+            }
+
+            // 交易信息
+            const txInfoContent = document.getElementById('txInfoContent');
+            if (result.transaction) {
+                const tx = result.transaction;
+                let txItems = '';
+                if (tx.tx_hash) {
+                    txItems += `<div class="info-item">
+                        <span class="info-label">交易哈希:</span>
+                        <span class="info-value"><code class="hash">${formatTxHash(tx.tx_hash)}</code></span>
+                    </div>`;
+                }
+                if (tx.gas_used) {
+                    txItems += `<div class="info-item">
+                        <span class="info-label">Gas使用:</span>
+                        <span class="info-value">${tx.gas_used}</span>
+                    </div>`;
+                }
+                txItems += `<div class="info-item">
+                    <span class="info-label">状态:</span>
+                    <span class="info-value status-success">✅ 成功</span>
+                </div>`;
+                txInfoContent.innerHTML = `<div class="info-grid">${txItems}</div>`;
+            } else {
+                txInfoContent.innerHTML = '<div class="empty-state">暂无数据</div>';
+            }
+
+            // 滚动到结果区域
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 显示错误
+        function displayError(error) {
+            document.getElementById('resultSection').style.display = 'block';
+
+            const statusDiv = document.getElementById('resultStatus');
+            statusDiv.className = 'result-status error';
+
+            // 根据错误类型显示不同的图标和消息
+            const errorType = error.error_type || 'unknown_error';
+            const errorMap = {
+                'validation_error': { icon: '⚠️', title: '参数错误' },
+                'connection_error': { icon: '🔌', title: '连接失败' },
+                'timeout_error': { icon: '⏱️', title: '请求超时' },
+                'issuance_error': { icon: '📜', title: 'VC颁发失败' },
+                'oracle_error': { icon: '🔮', title: 'Oracle错误' },
+                'network_error': { icon: '🌐', title: '网络错误' },
+                'unknown_error': { icon: '❌', title: '未知错误' }
+            };
+
+            const errorInfo = errorMap[errorType] || errorMap['unknown_error'];
+            statusDiv.innerHTML = `
+                <span class="status-icon">${errorInfo.icon}</span>
+                <div class="error-details">
+                    <div class="error-title">${errorInfo.title}</div>
+                    <div class="error-message">${error.error || '未知错误'}</div>
+                </div>
+            `;
+
+            // 显示调试信息
+            const allContent = document.querySelectorAll('.result-content');
+            allContent.forEach(el => {
+                el.innerHTML = `
+                    <div class="error-debug-info">
+                        <h5>错误详情</h5>
+                        <div class="debug-item">
+                            <span class="debug-label">错误类型:</span>
+                            <span class="debug-value">${errorType}</span>
+                        </div>
+                        <div class="debug-item">
+                            <span class="debug-label">错误消息:</span>
+                            <span class="debug-value">${error.error || '未知错误'}</span>
+                        </div>
+                        ${error.vc_type ? `
+                        <div class="debug-item">
+                            <span class="debug-label">VC类型:</span>
+                            <span class="debug-value">${error.vc_type}</span>
+                        </div>
+                        ` : ''}
+                        <div class="debug-item">
+                            <span class="debug-label">时间戳:</span>
+                            <span class="debug-value">${new Date().toLocaleString('zh-CN')}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 渲染属性
+        function renderAttributes(attributes) {
+            return `
+                <div class="attributes-grid">
+                    ${Object.entries(attributes).map(([key, value]) => `
+                        <div class="attribute-item">
+                            <span class="attr-key">${key}:</span>
+                            <span class="attr-value">${value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // 添加到历史记录
+        function addToHistory(vcType, vcData, result) {
+            const historyItem = {
+                vcType,
+                vcData,
+                result,
+                timestamp: new Date().toISOString()
+            };
+            issuanceHistory.unshift(historyItem);
+            if (issuanceHistory.length > 10) {
+                issuanceHistory.pop();
+            }
+            renderHistory();
+        }
+
+        // 渲染历史记录
+        function renderHistory() {
+            const historyDiv = document.getElementById('recentIssuance');
+            if (issuanceHistory.length === 0) {
+                historyDiv.innerHTML = '<div class="empty-state">暂无发行记录</div>';
+                return;
+            }
+
+            historyDiv.innerHTML = issuanceHistory.map(item => {
+                const config = VC_TYPES[item.vcType];
+                return `
+                    <div class="history-item" onclick="showHistoryDetail('${item.timestamp}')">
+                        <span class="history-icon">${config.icon}</span>
+                        <div class="history-info">
+                            <div class="history-name">${config.name}</div>
+                            <div class="history-time">${formatTimeAgo(new Date(item.timestamp))}</div>
+                        </div>
+                        <span class="history-status ${item.result.success ? 'success' : 'error'}">
+                            ${item.result.success ? '✅' : '❌'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 加载发行历史
+        async function loadIssuanceHistory() {
+            try {
+                const response = await fetch('/api/vc-issuance/history');
+                const data = await response.json();
+                if (data.success && data.history) {
+                    // 转换后端格式到前端格式（vc_type -> vcType）
+                    issuanceHistory = data.history.map(item => ({
+                        vcType: item.vc_type,
+                        vcData: item.holder_vc?.attrs || {},
+                        result: item,
+                        timestamp: item.timestamp
+                    }));
+                    renderHistory();
+                }
+            } catch (error) {
+                console.error('加载历史失败:', error);
+            }
+        }
+
+        // 检查Oracle状态
+        async function checkOracleStatus() {
+            try {
+                const response = await fetch('/api/vc-issuance/status');
+                const data = await response.json();
+                updateOracleStatus(data);
+            } catch (error) {
+                updateOracleStatus({ status: 'offline' });
+            }
+        }
+
+        // 更新Oracle状态显示
+        function updateOracleStatus(data) {
+            const indicator = document.getElementById('oracleStatus');
+            const dot = indicator.querySelector('.status-dot');
+            const text = indicator.querySelector('.status-text');
+
+            if (data.status === 'online') {
+                dot.className = 'status-dot success';
+                text.textContent = 'Oracle在线';
+            } else {
+                dot.className = 'status-dot error';
+                text.textContent = 'Oracle离线';
+            }
+        }
+
+        // 检查ACA-Py连接状态
+        async function checkAcaPyConnectionStatus() {
+            try {
+                const response = await fetch('/api/vc-issuance/connection-status');
+                const data = await response.json();
+                updateConnectionStatus(data);
+            } catch (error) {
+                updateConnectionStatus({ success: false });
+            }
+        }
+
+        // 更新连接状态显示
+        function updateConnectionStatus(data) {
+            const indicator = document.getElementById('acapyStatus');
+            const dot = indicator.querySelector('.status-dot');
+            const text = indicator.querySelector('.status-text');
+
+            if (data.success) {
+                const connections = data.connections || {};
+                // 检查issuer和holder是否都连接
+                const issuerConnected = connections.acapy_issuer === 'connected';
+                const holderConnected = connections.acapy_holder === 'connected';
+
+                if (issuerConnected && holderConnected) {
+                    dot.className = 'status-dot success';
+                    const connId = connections.active_connection ?
+                        ` (${connections.active_connection.slice(0, 8)}...)` : '';
+                    text.textContent = `ACA-Py已连接${connId}`;
+                } else {
+                    dot.className = 'status-dot warning';
+                    text.textContent = 'ACA-Py部分离线';
+                }
+            } else {
+                dot.className = 'status-dot error';
+                text.textContent = 'ACA-Py离线';
+            }
+        }
+
+        // 辅助函数
+        function formatID(id) {
+            if (!id) return 'N/A';
+            if (id.length > 30) return id.slice(0, 15) + '...' + id.slice(-10);
+            return id;
+        }
+
+        function formatAddress(addr) {
+            if (!addr || addr === 'unknown') return 'N/A';
+            if (addr.startsWith('0x') && addr.length > 20) {
+                return addr.slice(0, 8) + '...' + addr.slice(-6);
+            }
+            return addr;
+        }
+
+        function formatDID(did) {
+            if (!did) return 'N/A';
+            if (did.length > 30) return did.slice(0, 15) + '...' + did.slice(-10);
+            return did;
+        }
+
+        function formatTxHash(hash) {
+            if (!hash) return 'N/A';
+            if (hash.startsWith('0x') && hash.length > 20) {
+                return hash.slice(0, 10) + '...' + hash.slice(-8);
+            }
+            return hash;
+        }
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return '刚刚';
+            if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+            return date.toLocaleString('zh-CN');
+        }
+
+        function showLoading(show, text = '加载中...') {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // 刷新 VC 数据（从链上获取 UUID，精确匹配 Holder 中的 VC + vc_hash 双重验证）
+        async function refreshVCData() {
+            if (!currentIssuanceResult || !currentIssuanceResult.chain_data?.vc_hash) {
+                showToast('error', '没有可刷新的 VC 数据');
+                return;
+            }
+
+            const vcHash = currentIssuanceResult.chain_data.vc_hash;
+            const contractAddress = currentIssuanceResult.chain_data.contract_address;
+            const issuanceTimestamp = currentIssuanceResult.timestamp;
+
+            showLoading(true, '正在从链上获取 UUID 并匹配 VC 数据...');
+
+            try {
+                const response = await fetch('/api/vc-issuance/refresh-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vc_hash: vcHash,
+                        contract_address: contractAddress,
+                        issuance_timestamp: issuanceTimestamp
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 更新当前结果
+                    currentIssuanceResult.holder_vc = result.holder_vc;
+                    // 更新链上元数据（同时设置两种格式，确保前端能正确显示）
+                    currentIssuanceResult.chain_data.metadata = result.chain_metadata;
+                    currentIssuanceResult.chain_metadata = result.chain_metadata;
+                    // 保存从链上提取的 UUID
+                    currentIssuanceResult.chain_uuid = result.chain_uuid;
+
+                    // 重新显示结果
+                    displayResult(currentIssuanceResult);
+
+                    // 根据匹配方式显示不同的提示
+                    if (result.matched_by === 'uuid_exact_match') {
+                        showToast('success', 'UUID 精确匹配成功！VC 数据已刷新');
+                    } else if (result.matched_by === 'uuid_partial_match') {
+                        showToast('warning', 'UUID 部分匹配，VC 数据已刷新');
+                    } else if (result.matched_by === 'timestamp_fallback') {
+                        showToast('warning', 'UUID 匹配失败，使用兜底策略');
+                    } else {
+                        showToast('success', 'VC 数据已刷新');
+                    }
+
+                    // 如果有 UUID，在控制台输出
+                    if (result.chain_uuid) {
+                        console.log('[刷新 VC] 从链上提取的 UUID:', result.chain_uuid);
+                    }
+                } else {
+                    // 错误处理：同时显示 Toast 和结果区域错误详情
+                    const errorStepName = getErrorStepName(result.error_step);
+                    showToast('error', `${errorStepName}失败：${result.error}`);
+                    displayRefreshError(result);
+                }
+            } catch (error) {
+                showToast('error', '刷新失败：' + error.message);
+                // 显示网络错误详情
+                displayRefreshError({
+                    error: error.message,
+                    error_step: 'network_error',
+                    debug_info: {}
+                });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 获取错误步骤的中文名称
+        function getErrorStepName(step) {
+            const stepMap = {
+                'parameter_validation': '参数验证',
+                'chain_metadata_fetch': '链上元数据获取',
+                'uuid_extraction': 'UUID 提取',
+                'holder_vc_match': 'Holder VC 匹配',
+                'vc_hash_verification': 'vc_hash 验证',
+                'network_error': '网络错误',
+                'unknown_error': '未知错误'
+            };
+            return stepMap[step] || step;
+        }
+
+        // 在结果区域显示详细错误信息
+        function displayRefreshError(error) {
+            document.getElementById('resultSection').style.display = 'block';
+
+            const statusDiv = document.getElementById('resultStatus');
+            statusDiv.className = 'result-status error';
+
+            const errorStepName = getErrorStepName(error.error_step);
+            statusDiv.innerHTML = `
+                <span class="status-icon">❌</span>
+                <div class="error-details">
+                    <div class="error-title">${errorStepName}失败</div>
+                    <div class="error-message">${error.error || '未知错误'}</div>
+                </div>
+            `;
+
+            // 显示调试信息
+            const debugInfo = error.debug_info || {};
+            const debugHtml = Object.entries(debugInfo).map(([key, value]) => `
+                <div class="debug-item">
+                    <span class="debug-label">${key}:</span>
+                    <span class="debug-value">${typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                </div>
+            `).join('');
+
+            const allContent = document.querySelectorAll('.result-content');
+            allContent.forEach(el => {
+                el.innerHTML = `
+                    <div class="error-debug-info">
+                        <h5>错误详情</h5>
+                        <div class="debug-item">
+                            <span class="debug-label">错误步骤:</span>
+                            <span class="debug-value">${errorStepName} (${error.error_step || 'unknown'})</span>
+                        </div>
+                        <div class="debug-item">
+                            <span class="debug-label">错误消息:</span>
+                            <span class="debug-value">${error.error || '未知错误'}</span>
+                        </div>
+                        ${debugHtml}
+                        <div class="debug-item">
+                            <span class="debug-label">时间戳:</span>
+                            <span class="debug-value">${new Date().toLocaleString('zh-CN')}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

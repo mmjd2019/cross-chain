@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "description": "VC发行测试数据 - 预定义的测试用例（4种VC类型）",
+    "version": "2.0",
+    "created_at": "2026-02-14",
+    "cred_def_version": "V9",
+    "usage": "用于测试VC发行Oracle服务，通过 test_vc_issuance_from_json.py 读取并发送到 /issue-vc 端点"
+  },
+  "test_cases": {
+    "inspection_report_basic": {
+      "description": "质检报告 - 基础测试",
+      "vc_type": "InspectionReport",
+      "metadata": {
+        "vcName": "质检报告-基础测试",
+        "vcDescription": "使用CredDef V8",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "测试出口商公司",
+        "contractName": "INSPECTION-BASIC-001",
+        "productName": "电子产品A",
+        "productQuantity": "1000",
+        "productBatch": "BATCH-2026-001",
+        "inspectionPassed": "true",
+        "Date": "2026-02-14"
+      }
+    },
+    "insurance_contract_basic": {
+      "description": "保险合同 - 基础测试",
+      "vc_type": "InsuranceContract",
+      "metadata": {
+        "vcName": "保险合同-基础测试",
+        "vcDescription": "使用CredDef V8",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "出口贸易公司",
+        "importer": "进口贸易公司",
+        "contractName": "INSURANCE-BASIC-001",
+        "productName": "工业设备",
+        "productQuantity": "50",
+        "productBatch": "BATCH-INS-001",
+        "insuranceAmount": "1000000",
+        "insuranceCompany": "国际保险公司",
+        "isInsured": "true",
+        "Date": "2026-02-14"
+      }
+    },
+    "certificate_of_origin_basic": {
+      "description": "原产地证书 - 基础测试",
+      "vc_type": "CertificateOfOrigin",
+      "metadata": {
+        "vcName": "原产地证书-基础测试",
+        "vcDescription": "使用CredDef V8",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "制造商A",
+        "importer": "采购商B",
+        "certifier": "认证机构C",
+        "contractName": "COO-BASIC-001",
+        "productName": "高精度仪器",
+        "productQuantity": "100",
+        "productBatch": "BATCH-COO-001",
+        "placeOfOrigin": "中国深圳",
+        "Date": "2026-02-14"
+      }
+    },
+    "bill_of_lading_basic": {
+      "description": "提单证书 - 基础测试",
+      "vc_type": "BillOfLadingCertificate",
+      "metadata": {
+        "vcName": "提单证书-基础测试",
+        "vcDescription": "使用CredDef V8",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "出口商D",
+        "shippingCompany": "航运公司E",
+        "contractName": "BOL-BASIC-001",
+        "productName": "集装箱货物",
+        "productQuantity": "200",
+        "productBatch": "BATCH-BOL-001",
+        "portOfDeparture": "上海港",
+        "portOfArrival": "洛杉矶港",
+        "departureDate": "2026-02-15",
+        "scheduledArrivalDate": "2026-03-01"
+      }
+    },
+    "inspection_report_full": {
+      "description": "质检报告 - 完整测试（中文）",
+      "vc_type": "InspectionReport",
+      "metadata": {
+        "vcName": "质检报告-完整测试",
+        "vcDescription": "包含中文字符的完整测试",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "北京测试出口贸易有限公司",
+        "contractName": "INSPECTION-FULL-002",
+        "productName": "高科技电子产品-型号X2026",
+        "productQuantity": "5000",
+        "productBatch": "BATCH-FULL-002",
+        "inspectionPassed": "true",
+        "Date": "2026-02-14"
+      }
+    },
+    "insurance_contract_full": {
+      "description": "保险合同 - 完整测试",
+      "vc_type": "InsuranceContract",
+      "metadata": {
+        "vcName": "保险合同-完整测试",
+        "vcDescription": "完整属性测试",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "广东电子出口有限公司",
+        "importer": "美国进口集团",
+        "contractName": "INSURANCE-FULL-002",
+        "productName": "智能家电套装",
+        "productQuantity": "10000",
+        "productBatch": "BATCH-INS-FULL-002",
+        "insuranceAmount": "5000000",
+        "insuranceCompany": "中国太平洋保险",
+        "isInsured": "true",
+        "Date": "2026-02-14"
+      }
+    },
+    "certificate_of_origin_full": {
+      "description": "原产地证书 - 完整测试",
+      "vc_type": "CertificateOfOrigin",
+      "metadata": {
+        "vcName": "原产地证书-完整测试",
+        "vcDescription": "完整属性测试",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "浙江制造集团",
+        "importer": "欧洲贸易公司",
+        "certifier": "中国国际贸易促进委员会",
+        "contractName": "COO-FULL-002",
+        "productName": "精密机械设备",
+        "productQuantity": "500",
+        "productBatch": "BATCH-COO-FULL-002",
+        "placeOfOrigin": "中国浙江杭州",
+        "Date": "2026-02-14"
+      }
+    },
+    "bill_of_lading_full": {
+      "description": "提单证书 - 完整测试",
+      "vc_type": "BillOfLadingCertificate",
+      "metadata": {
+        "vcName": "提单证书-完整测试",
+        "vcDescription": "完整属性测试",
+        "expiryTime": 1735689600
+      },
+      "attributes": {
+        "exporter": "江苏出口公司",
+        "shippingCompany": "中远海运集团",
+        "contractName": "BOL-FULL-002",
+        "productName": "纺织品集装箱",
+        "productQuantity": "1000",
+        "productBatch": "BATCH-BOL-FULL-002",
+        "portOfDeparture": "宁波港",
+        "portOfArrival": "鹿特丹港",
+        "departureDate": "2026-02-20",
+        "scheduledArrivalDate": "2026-03-15"
+      }
+    }
+  },
+  "test_sequences": {
+    "all_basic": [
+      "inspection_report_basic",
+      "insurance_contract_basic",
+      "certificate_of_origin_basic",
+      "bill_of_lading_basic"
+    ],
+    "all_full": [
+      "inspection_report_full",
+      "insurance_contract_full",
+      "certificate_of_origin_full",
+      "bill_of_lading_full"
+    ],
+    "inspection_only": [
+      "inspection_report_basic",
+      "inspection_report_full"
+    ]
+  },
+  "default_test": "inspection_report_basic",
+  "oracle_endpoint": {
+    "url": "http://localhost:6000",
+    "issue_vc_path": "/issue-vc",
+    "health_path": "/health"
+  },
+  "cred_def_ids": {
+    "InspectionReport": "DPvobytTtKvmyeRTJZYjsg:3:CL:62:InspectionReport_V9",
+    "InsuranceContract": "DPvobytTtKvmyeRTJZYjsg:3:CL:64:InsuranceContract_V9",
+    "CertificateOfOrigin": "DPvobytTtKvmyeRTJZYjsg:3:CL:66:CertificateOfOrigin_V9",
+    "BillOfLadingCertificate": "DPvobytTtKvmyeRTJZYjsg:3:CL:68:BillOfLadingCertificate_V9"
+  }
+}

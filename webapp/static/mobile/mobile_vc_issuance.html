@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VC 发行</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding-bottom: 32px;
+        }
+
+        /* Nav Bar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .back-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 20px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .navbar h1 {
+            flex: 1;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+        }
+        .navbar .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .navbar .status-dot.online { background: #10b981; }
+        .navbar .status-dot.offline { background: #ef4444; }
+
+        /* VC Type Tabs */
+        .vc-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .vc-tabs::-webkit-scrollbar { display: none; }
+
+        .vc-tab {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+        .vc-tab .tab-icon { font-size: 22px; }
+        .vc-tab .tab-name { font-size: 11px; color: #666; font-weight: 500; }
+        .vc-tab.active {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+        .vc-tab.active .tab-name { color: #6366f1; font-weight: 600; }
+
+        /* Content */
+        .content { padding: 0 16px; }
+
+        /* Section Card */
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .section-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        /* Placeholder */
+        .placeholder {
+            text-align: center;
+            padding: 32px 16px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            background: #fafafa;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+        .btn-sample {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #eef2ff;
+            color: #6366f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Result */
+        .result-card {
+            background: white;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .result-card .result-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .result-card .result-header.success { background: #ecfdf5; color: #059669; }
+        .result-card .result-header.error { background: #fef2f2; color: #dc2626; }
+        .result-card .result-body {
+            padding: 12px 16px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-item .lbl { color: #888; }
+        .info-item .val { color: #333; font-weight: 500; text-align: right; max-width: 65%; word-break: break-all; }
+        .info-item code { font-size: 11px; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
+
+        /* Loading Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay-box {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            min-width: 200px;
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .overlay-box p { font-size: 14px; color: #555; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            max-width: 90%;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #ecfdf5; color: #059669; }
+        .toast.error { background: #fef2f2; color: #dc2626; }
+        .toast.warning { background: #fffbeb; color: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Nav -->
+        <div class="navbar">
+            <a href="/static/mobile/mobile_index.html" class="back-btn">‹</a>
+            <h1>VC 发行</h1>
+            <span class="status-dot" id="acapyDot"></span>
+        </div>
+
+        <!-- VC Type Tabs -->
+        <div class="vc-tabs" id="vcTabs">
+            <div class="vc-tab" data-type="InspectionReport" onclick="selectVCType('InspectionReport')">
+                <span class="tab-icon">📋</span>
+                <span class="tab-name">质检报告</span>
+            </div>
+            <div class="vc-tab" data-type="InsuranceContract" onclick="selectVCType('InsuranceContract')">
+                <span class="tab-icon">🛡️</span>
+                <span class="tab-name">保险合同</span>
+            </div>
+            <div class="vc-tab" data-type="CertificateOfOrigin" onclick="selectVCType('CertificateOfOrigin')">
+                <span class="tab-icon">📜</span>
+                <span class="tab-name">原产地证明</span>
+            </div>
+            <div class="vc-tab" data-type="BillOfLadingCertificate" onclick="selectVCType('BillOfLadingCertificate')">
+                <span class="tab-icon">🚢</span>
+                <span class="tab-name">提单</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Placeholder before selection -->
+            <div id="placeholder" class="placeholder">
+                请选择要发行的 VC 类型
+            </div>
+
+            <!-- Form Section -->
+            <div id="formSection" style="display:none;">
+                <div class="section-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h3 id="formTitle">填写属性</h3>
+                        <button class="btn-sample" onclick="loadSampleData()">填入示例</button>
+                    </div>
+                    <form id="vcForm">
+                        <div id="formFields"></div>
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                            <button type="submit" class="btn btn-primary">发行 VC</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="resultSection" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-box">
+            <div class="spinner"></div>
+            <p id="overlayText">正在发行 VC...</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const VC_TYPES = {
+            'InspectionReport': {
+                name: '质检报告', icon: '📋',
+                description: '产品质量检验证书',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: 'ABC Export Co.' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: 'CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: 'BATCH-2024-001' },
+                    { name: 'inspectionPassed', label: '检验通过', type: 'select', options: ['true', 'false'] },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'InsuranceContract': {
+                name: '保险合同', icon: '🛡️',
+                description: '货物保险证明',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: 'ABC Export Co.' },
+                    { name: 'importer', label: '进口商', type: 'text', placeholder: 'XYZ Import Inc.' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: 'CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: 'BATCH-2024-001' },
+                    { name: 'insuranceAmount', label: '保险金额', type: 'number', placeholder: '100000' },
+                    { name: 'insuranceCompany', label: '保险公司', type: 'text', placeholder: 'Safe Insurance Co.' },
+                    { name: 'isInsured', label: '已投保', type: 'select', options: ['true', 'false'] },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'CertificateOfOrigin': {
+                name: '原产地证明', icon: '📜',
+                description: '货物原产地官方证书',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: 'ABC Export Co.' },
+                    { name: 'importer', label: '进口商', type: 'text', placeholder: 'XYZ Import Inc.' },
+                    { name: 'certifier', label: '认证机构', type: 'text', placeholder: 'Quality Cert Authority' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: 'CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: 'BATCH-2024-001' },
+                    { name: 'placeOfOrigin', label: '原产地', type: 'text', placeholder: '中国上海' },
+                    { name: 'Date', label: '日期', type: 'date' }
+                ]
+            },
+            'BillOfLadingCertificate': {
+                name: '提单', icon: '🚢',
+                description: '海运提单证书',
+                attributes: [
+                    { name: 'exporter', label: '出口商', type: 'text', placeholder: 'ABC Export Co.' },
+                    { name: 'shippingCompany', label: '船运公司', type: 'text', placeholder: 'Global Shipping Lines' },
+                    { name: 'contractName', label: '合同名称', type: 'text', placeholder: 'CON-2024-001' },
+                    { name: 'productName', label: '产品名称', type: 'text', placeholder: '工业设备 X-100' },
+                    { name: 'productQuantity', label: '产品数量', type: 'number', placeholder: '1000' },
+                    { name: 'productBatch', label: '产品批次', type: 'text', placeholder: 'BATCH-2024-001' },
+                    { name: 'portOfDeparture', label: '装货港', type: 'text', placeholder: '上海港' },
+                    { name: 'portOfArrival', label: '卸货港', type: 'text', placeholder: '洛杉矶港' },
+                    { name: 'departureDate', label: '出发日期', type: 'date' },
+                    { name: 'scheduledArrivalDate', label: '预计到达日期', type: 'date' }
+                ]
+            }
+        };
+
+        let currentVCType = null;
+        let currentResult = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadVCConfig();
+            checkConnection();
+            setInterval(checkConnection, 30000);
+        });
+
+        async function loadVCConfig() {
+            try {
+                const res = await fetch('/api/vc-issuance/vc-types-config');
+                const data = await res.json();
+                if (data.success && data.vc_types) {
+                    // config loaded, cred_def_id available if needed
+                }
+            } catch (e) { /* use defaults */ }
+        }
+
+        async function checkConnection() {
+            try {
+                const res = await fetch('/api/vc-issuance/connection-status');
+                const data = await res.json();
+                const dot = document.getElementById('acapyDot');
+                const online = data.success &&
+                    data.connections?.acapy_issuer === 'connected' &&
+                    data.connections?.acapy_holder === 'connected';
+                dot.className = 'status-dot ' + (online ? 'online' : 'offline');
+            } catch (e) {
+                document.getElementById('acapyDot').className = 'status-dot offline';
+            }
+        }
+
+        function selectVCType(vcType) {
+            currentVCType = vcType;
+            const cfg = VC_TYPES[vcType];
+
+            // Update tabs
+            document.querySelectorAll('.vc-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.type === vcType);
+            });
+
+            // Show form
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('formTitle').textContent = cfg.name + ' (' + cfg.attributes.length + '个属性)';
+
+            generateForm(cfg.attributes);
+        }
+
+        function generateForm(attributes) {
+            const container = document.getElementById('formFields');
+            container.innerHTML = '';
+            attributes.forEach(attr => {
+                const group = document.createElement('div');
+                group.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.textContent = attr.label;
+                label.setAttribute('for', attr.name);
+
+                let input;
+                if (attr.type === 'select') {
+                    input = document.createElement('select');
+                    attr.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt === 'true' ? '是' : (opt === 'false' ? '否' : opt);
+                        input.appendChild(option);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = attr.type;
+                    input.placeholder = attr.placeholder || '';
+                }
+                input.id = attr.name;
+                input.name = attr.name;
+                if (attr.type !== 'date') input.required = true;
+
+                group.appendChild(label);
+                group.appendChild(input);
+                container.appendChild(group);
+            });
+        }
+
+        function loadSampleData() {
+            if (!currentVCType) return;
+            const today = new Date().toISOString().split('T')[0];
+            const samples = {
+                'InspectionReport': {
+                    exporter: 'ABC Export Co.', contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100', productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001', inspectionPassed: 'true', Date: today
+                },
+                'InsuranceContract': {
+                    exporter: 'ABC Export Co.', importer: 'XYZ Import Inc.',
+                    contractName: 'CON-2024-001', productName: '工业设备 X-100',
+                    productQuantity: '1000', productBatch: 'BATCH-2024-001',
+                    insuranceAmount: '100000', insuranceCompany: 'Safe Insurance Co.',
+                    isInsured: 'true', Date: today
+                },
+                'CertificateOfOrigin': {
+                    exporter: 'ABC Export Co.', importer: 'XYZ Import Inc.',
+                    certifier: 'Quality Cert Authority', contractName: 'CON-2024-001',
+                    productName: '工业设备 X-100', productQuantity: '1000',
+                    productBatch: 'BATCH-2024-001', placeOfOrigin: '中国上海', Date: today
+                },
+                'BillOfLadingCertificate': {
+                    exporter: 'ABC Export Co.', shippingCompany: 'Global Shipping Lines',
+                    contractName: 'CON-2024-001', productName: '工业设备 X-100',
+                    productQuantity: '1000', productBatch: 'BATCH-2024-001',
+                    portOfDeparture: '上海港', portOfArrival: '洛杉矶港',
+                    departureDate: today, scheduledArrivalDate: today
+                }
+            };
+            const data = samples[currentVCType];
+            for (const [key, value] of Object.entries(data)) {
+                const el = document.getElementById(key);
+                if (el) el.value = value;
+            }
+            showToast('success', '已填入示例数据');
+        }
+
+        function resetForm() {
+            document.getElementById('vcForm').reset();
+        }
+
+        document.getElementById('vcForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentVCType) return;
+
+            const formData = new FormData(e.target);
+            const attrs = {};
+            for (const [key, value] of formData.entries()) {
+                attrs[key] = value;
+            }
+            await issueVC(currentVCType, attrs);
+        });
+
+        async function issueVC(vcType, attrs) {
+            showOverlay('正在发行 VC...');
+            try {
+                const res = await fetch('/api/vc-issuance/issue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vc_type: vcType, attributes: attrs })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('success', 'VC 发行成功！');
+                    currentResult = result;
+                    displayResult(result);
+                } else {
+                    showToast('error', '发行失败: ' + (result.error || '未知错误'));
+                    displayError(result);
+                }
+            } catch (err) {
+                showToast('error', '网络错误: ' + err.message);
+            } finally {
+                hideOverlay();
+            }
+        }
+
+        function displayResult(result) {
+            const section = document.getElementById('resultSection');
+            section.style.display = 'block';
+            let html = '';
+
+            // Success header
+            html += '<div class="result-card"><div class="result-header success">✅ VC 发行成功</div></div>';
+
+            // Holder VC
+            if (result.holder_vc) {
+                const vc = result.holder_vc;
+                html += '<div class="result-card"><div class="result-header">📱 Holder VC</div><div class="result-body">';
+                if (vc.id) html += infoItem('VC ID', fmtID(vc.id));
+                if (vc.schema_id) html += infoItem('Schema ID', fmtID(vc.schema_id));
+                if (vc.cred_def_id) html += infoItem('Cred Def ID', fmtID(vc.cred_def_id));
+                html += '</div></div>';
+            }
+
+            // Chain data
+            if (result.chain_data && result.chain_data.vc_hash) {
+                html += '<div class="result-card"><div class="result-header">🔗 链上数据</div><div class="result-body">';
+                html += infoItem('VC Hash', result.chain_data.vc_hash);
+                html += infoItem('合约地址', fmtAddr(result.chain_data.contract_address));
+                if (result.chain_data.block_number) html += infoItem('区块号', result.chain_data.block_number);
+
+                // UUID
+                let uuid = result.chain_uuid || null;
+                if (!uuid && result.chain_data.metadata && result.chain_data.metadata.vc_name) {
+                    const m = result.chain_data.metadata.vc_name.match(/UUID:\s*([a-f0-9\-]{36})/i);
+                    if (m) uuid = m[1];
+                }
+                if (uuid) {
+                    html += infoItem('UUID', uuid);
+                }
+                html += '</div></div>';
+            }
+
+            // Chain metadata
+            if (result.chain_data && (result.chain_data.metadata || result.chain_metadata)) {
+                const meta = result.chain_metadata || result.chain_data.metadata;
+                const vcName = meta.vc_name || meta.vcName || 'N/A';
+                const vcDesc = meta.vc_description || meta.vcDescription || 'N/A';
+                const issuerDid = meta.issuer_did || 'N/A';
+                const holderDid = meta.holder_did || 'N/A';
+                const blockchain = meta.blockchain_type || meta.blockchainType || 'N/A';
+
+                html += '<div class="result-card"><div class="result-header">📋 链上元数据</div><div class="result-body">';
+                html += infoItem('VC名称', vcName);
+                html += infoItem('VC描述', vcDesc);
+                html += infoItem('发行者DID', fmtID(issuerDid));
+                html += infoItem('持有者DID', fmtID(holderDid));
+                html += infoItem('区块链', blockchain);
+                html += '</div></div>';
+            }
+
+            // Transaction
+            if (result.transaction) {
+                html += '<div class="result-card"><div class="result-header">💳 交易信息</div><div class="result-body">';
+                if (result.transaction.tx_hash) html += infoItem('交易哈希', fmtTx(result.transaction.tx_hash));
+                if (result.transaction.gas_used) html += infoItem('Gas使用', result.transaction.gas_used);
+                html += '</div></div>';
+            }
+
+            // Refresh button
+            if (result.success && result.chain_data?.vc_hash) {
+                html += '<div style="padding:0 16px;"><button class="btn btn-secondary" style="width:100%;" onclick="refreshVCData()">🔄 刷新链上数据</button></div>';
+            }
+
+            section.innerHTML = html;
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayError(error) {
+            const section = document.getElementById('resultSection');
+            section.style.display = 'block';
+            section.innerHTML = `
+                <div class="result-card">
+                    <div class="result-header error">❌ 发行失败</div>
+                    <div class="result-body">
+                        ${infoItem('错误', error.error || '未知错误')}
+                        ${infoItem('类型', error.error_type || '-')}
+                        ${infoItem('时间', new Date().toLocaleString('zh-CN'))}
+                    </div>
+                </div>`;
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function refreshVCData() {
+            if (!currentResult?.chain_data?.vc_hash) {
+                showToast('error', '没有可刷新的数据');
+                return;
+            }
+            showOverlay('正在刷新链上数据...');
+            try {
+                const res = await fetch('/api/vc-issuance/refresh-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vc_hash: currentResult.chain_data.vc_hash,
+                        contract_address: currentResult.chain_data.contract_address,
+                        issuance_timestamp: currentResult.timestamp
+                    })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    currentResult.holder_vc = result.holder_vc;
+                    currentResult.chain_data.metadata = result.chain_metadata;
+                    currentResult.chain_metadata = result.chain_metadata;
+                    currentResult.chain_uuid = result.chain_uuid;
+                    displayResult(currentResult);
+                    showToast('success', 'VC 数据已刷新');
+                } else {
+                    showToast('error', '刷新失败: ' + (result.error || ''));
+                }
+            } catch (err) {
+                showToast('error', '刷新失败: ' + err.message);
+            } finally {
+                hideOverlay();
+            }
+        }
+
+        // Helpers
+        function infoItem(lbl, val) {
+            return `<div class="info-item"><span class="lbl">${lbl}</span><span class="val"><code>${val}</code></span></div>`;
+        }
+        function fmtID(id) {
+            if (!id) return 'N/A';
+            return id.length > 30 ? id.slice(0, 14) + '...' + id.slice(-8) : id;
+        }
+        function fmtAddr(a) {
+            if (!a || a === 'unknown') return 'N/A';
+            return a.startsWith('0x') && a.length > 20 ? a.slice(0, 8) + '...' + a.slice(-6) : a;
+        }
+        function fmtTx(h) {
+            if (!h) return 'N/A';
+            return h.startsWith('0x') && h.length > 20 ? h.slice(0, 10) + '...' + h.slice(-8) : h;
+        }
+
+        function showOverlay(text) {
+            document.getElementById('overlayText').textContent = text;
+            document.getElementById('overlay').classList.add('active');
+        }
+        function hideOverlay() {
+            document.getElementById('overlay').classList.remove('active');
+        }
+        function showToast(type, msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

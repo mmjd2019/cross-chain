@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VP 验证 - 跨链可验证凭证系统</title>
+    <link rel="stylesheet" href="/static/css/vp_verification.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/" class="back-link">← 返回首页</a>
+                <h1>VP 验证</h1>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="oracleStatus"></span>
+                <span class="status-text">Oracle 服务</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>VC 类型</h2>
+            </div>
+
+            <!-- VC 类型列表 -->
+            <div class="vc-type-list" id="vcTypeList">
+                <button class="vc-type-btn active" data-vc-type="InspectionReport">
+                    <span class="vc-type-icon">📋</span>
+                    <span class="vc-type-name">检验报告</span>
+                    <span class="vc-type-en">InspectionReport</span>
+                </button>
+                <button class="vc-type-btn" data-vc-type="InsuranceContract">
+                    <span class="vc-type-icon">🛡️</span>
+                    <span class="vc-type-name">保险合同</span>
+                    <span class="vc-type-en">InsuranceContract</span>
+                </button>
+                <button class="vc-type-btn" data-vc-type="CertificateOfOrigin">
+                    <span class="vc-type-icon">📜</span>
+                    <span class="vc-type-name">原产地证书</span>
+                    <span class="vc-type-en">CertificateOfOrigin</span>
+                </button>
+                <button class="vc-type-btn" data-vc-type="BillOfLadingCertificate">
+                    <span class="vc-type-icon">🚢</span>
+                    <span class="vc-type-name">提单证书</span>
+                    <span class="vc-type-en">BillOfLadingCertificate</span>
+                </button>
+            </div>
+
+            <!-- Holder 凭证信息 -->
+            <div class="sidebar-section">
+                <h3>Holder 凭证</h3>
+                <div class="holder-info" id="holderInfo">
+                    <div class="empty-state">选择 VC 类型后加载</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 内容区 -->
+        <section class="content">
+            <!-- 步骤 1: 选择 VC -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>步骤 1: 选择 VC</h2>
+                    <span class="badge info" id="vcCountBadge" style="display: none;">0 个记录</span>
+                </div>
+                <div class="card-body">
+                    <p class="info-text">从 uuid.json 中选择要验证的 VC 记录。</p>
+
+                    <!-- VC 记录列表 -->
+                    <div class="vc-record-section">
+                        <h3>最新 VC 记录</h3>
+                        <div class="vc-record-grid" id="vcRecordGrid">
+                            <div class="empty-state">请先选择 VC 类型</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤 2: 配置验证条件 -->
+            <div class="card" id="configCard" style="display: none;">
+                <div class="card-header">
+                    <h2>步骤 2: 配置验证条件</h2>
+                </div>
+                <div class="card-body">
+                    <p class="info-text">配置谓词条件和属性过滤器（可选，默认使用配置文件中的策略）</p>
+
+                    <!-- 谓词条件 -->
+                    <div class="config-section">
+                        <h3>谓词条件</h3>
+                        <div id="predicateContainer">
+                            <div class="empty-state">当前 VC 类型无默认谓词</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="addPredicateBtn">
+                            <span>+</span> 添加谓词
+                        </button>
+                    </div>
+
+                    <!-- 属性过滤器 -->
+                    <div class="config-section">
+                        <h3>属性过滤器（零知识验证）</h3>
+                        <div id="attributeFilterContainer">
+                            <div class="empty-state">当前 VC 类型无默认属性过滤器</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="addAttributeFilterBtn">
+                            <span>+</span> 添加属性过滤
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤 3: 执行验证 -->
+            <div class="card" id="verifyCard" style="display: none;">
+                <div class="card-header">
+                    <h2>步骤 3: 执行验证</h2>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary btn-lg" id="verifyBtn">
+                        <span>✓</span> 执行验证
+                    </button>
+
+                    <!-- 验证进度 -->
+                    <div class="progress-section" id="progressSection" style="display: none;">
+                        <h3>验证进度</h3>
+                        <div class="progress-steps">
+                            <div class="progress-step" id="step2Progress">
+                                <div class="step-indicator"></div>
+                                <div class="step-label">步骤 2: UUID 匹配验证</div>
+                            </div>
+                            <div class="progress-step" id="step3Progress">
+                                <div class="step-indicator"></div>
+                                <div class="step-label">步骤 3: 完整验证</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 验证结果 -->
+                    <div class="result-section" id="resultSection" style="display: none;">
+                        <h3>验证结果</h3>
+
+                        <!-- 总体状态 -->
+                        <div class="result-status" id="resultStatus">
+                            <span class="status-icon"></span>
+                            <span class="status-text"></span>
+                        </div>
+
+                        <!-- 步骤 2 结果 -->
+                        <div class="result-detail" id="step2Result">
+                            <h4>步骤 2: UUID 匹配验证</h4>
+                            <div class="result-content"></div>
+                        </div>
+
+                        <!-- 步骤 3 结果 -->
+                        <div class="result-detail" id="step3Result">
+                            <h4>步骤 3: 完整验证</h4>
+                            <div class="result-content">
+                                <div class="revealed-attrs">
+                                    <h5>披露的属性</h5>
+                                    <ul id="revealedAttrsList"></ul>
+                                </div>
+                                <div class="predicate-results">
+                                    <h5>谓词验证结果</h5>
+                                    <ul id="predicateResultsList"></ul>
+                                </div>
+                                <div class="restriction-results">
+                                    <h5>限制条件验证结果</h5>
+                                    <ul id="restrictionResultsList"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 错误信息 -->
+                        <div class="error-detail" id="errorDetail" style="display: none;">
+                            <h4>错误信息</h4>
+                            <pre id="errorText"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/static/js/vp_verification.js"></script>
+</body>
+</html>

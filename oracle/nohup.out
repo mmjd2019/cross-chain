@@ -1,0 +1,162 @@
+2026-04-12 00:24:11,873 - VCTransferOracle - INFO - [vc_transfer_oracle.py:132] - 状态文件加载成功: 65 条已处理记录
+2026-04-12 00:24:11,873 - INFO - 状态文件加载成功: 65 条已处理记录
+2026-04-12 00:24:11,873 - VCTransferOracle - INFO - [vc_transfer_oracle.py:100] - ================================================================================
+2026-04-12 00:24:11,873 - INFO - ================================================================================
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:101] - 跨链VC元数据传输Oracle服务初始化
+2026-04-12 00:24:11,874 - INFO - 跨链VC元数据传输Oracle服务初始化
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:102] - Oracle DID: 6VDa4HBhtvFaWVf21xRFmf
+2026-04-12 00:24:11,874 - INFO - Oracle DID: 6VDa4HBhtvFaWVf21xRFmf
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:103] - Oracle地址: 0x85303A9AeD94B8C58a8cD5E6fBB80725488EA434
+2026-04-12 00:24:11,874 - INFO - Oracle地址: 0x85303A9AeD94B8C58a8cD5E6fBB80725488EA434
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:104] - ================================================================================
+2026-04-12 00:24:11,874 - INFO - ================================================================================
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:152] - 初始化区块链连接...
+2026-04-12 00:24:11,874 - INFO - 初始化区块链连接...
+2026-04-12 00:24:11,874 - VCTransferOracle - INFO - [vc_transfer_oracle.py:156] - 连接 Chain A...
+2026-04-12 00:24:11,874 - INFO - 连接 Chain A...
+2026-04-12 00:24:11,875 - INFO - 🔗 初始化 Chain A 连接: http://localhost:8545
+2026-04-12 00:24:11,914 - VCTransferOracle - INFO - [vc_transfer_oracle.py:191] - ✅ Chain A 连接成功 (Chain ID: 2023, 当前区块: 355906)
+2026-04-12 00:24:11,914 - INFO - ✅ Chain A 连接成功 (Chain ID: 2023, 当前区块: 355906)
+2026-04-12 00:24:11,914 - VCTransferOracle - INFO - [vc_transfer_oracle.py:156] - 连接 Chain B...
+2026-04-12 00:24:11,914 - INFO - 连接 Chain B...
+2026-04-12 00:24:11,915 - INFO - 🔗 初始化 Chain B 连接: http://localhost:8555
+2026-04-12 00:24:11,942 - VCTransferOracle - INFO - [vc_transfer_oracle.py:191] - ✅ Chain B 连接成功 (Chain ID: 2024, 当前区块: 208925)
+2026-04-12 00:24:11,942 - INFO - ✅ Chain B 连接成功 (Chain ID: 2024, 当前区块: 208925)
+2026-04-12 00:24:11,942 - VCTransferOracle - INFO - [vc_transfer_oracle.py:570] - ================================================================================
+2026-04-12 00:24:11,942 - INFO - ================================================================================
+2026-04-12 00:24:11,942 - VCTransferOracle - INFO - [vc_transfer_oracle.py:571] - 开始扫描历史遗留 VC...
+2026-04-12 00:24:11,942 - INFO - 开始扫描历史遗留 VC...
+2026-04-12 00:24:11,942 - VCTransferOracle - INFO - [vc_transfer_oracle.py:572] - ================================================================================
+2026-04-12 00:24:11,942 - INFO - ================================================================================
+2026-04-12 00:24:11,942 - VCTransferOracle - INFO - [vc_transfer_oracle.py:485] - 开始扫描 chain_a 的历史遗留 VC...
+2026-04-12 00:24:11,942 - INFO - 开始扫描 chain_a 的历史遗留 VC...
+2026-04-12 00:24:11,961 - VCTransferOracle - INFO - [vc_transfer_oracle.py:495] - chain_a sendList 中有 65 个 VC
+2026-04-12 00:24:11,961 - INFO - chain_a sendList 中有 65 个 VC
+2026-04-12 00:24:11,962 - VCTransferOracle - INFO - [vc_transfer_oracle.py:560] - ✅ chain_a 没有需要传输的历史遗留 VC
+2026-04-12 00:24:11,962 - INFO - ✅ chain_a 没有需要传输的历史遗留 VC
+2026-04-12 00:24:11,962 - VCTransferOracle - INFO - [vc_transfer_oracle.py:485] - 开始扫描 chain_b 的历史遗留 VC...
+2026-04-12 00:24:11,962 - INFO - 开始扫描 chain_b 的历史遗留 VC...
+2026-04-12 00:24:11,972 - VCTransferOracle - INFO - [vc_transfer_oracle.py:492] - chain_b sendList 为空，无需扫描
+2026-04-12 00:24:11,972 - INFO - chain_b sendList 为空，无需扫描
+2026-04-12 00:24:11,972 - VCTransferOracle - INFO - [vc_transfer_oracle.py:577] - ================================================================================
+2026-04-12 00:24:11,972 - INFO - ================================================================================
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:578] - 历史遗留 VC 扫描完成，启动事件监听...
+2026-04-12 00:24:11,973 - INFO - 历史遗留 VC 扫描完成，启动事件监听...
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:579] - ================================================================================
+2026-04-12 00:24:11,973 - INFO - ================================================================================
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:582] - 启动事件监听任务...
+2026-04-12 00:24:11,973 - INFO - 启动事件监听任务...
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:594] - ================================================================================
+2026-04-12 00:24:11,973 - INFO - ================================================================================
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:595] - 🚀 跨链VC元数据传输Oracle服务已启动
+2026-04-12 00:24:11,973 - INFO - 🚀 跨链VC元数据传输Oracle服务已启动
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:596] - 监听链: ['chain_a', 'chain_b']
+2026-04-12 00:24:11,973 - INFO - 监听链: ['chain_a', 'chain_b']
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:597] - 轮询间隔: 5 秒
+2026-04-12 00:24:11,973 - INFO - 轮询间隔: 5 秒
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:598] - ================================================================================
+2026-04-12 00:24:11,973 - INFO - ================================================================================
+2026-04-12 00:24:11,973 - VCTransferOracle - INFO - [vc_transfer_oracle.py:421] - 开始监听 chain_a 的VCSent事件 (从区块 355906)
+2026-04-12 00:24:11,973 - INFO - 开始监听 chain_a 的VCSent事件 (从区块 355906)
+2026-04-12 00:24:11,976 - VCTransferOracle - INFO - [vc_transfer_oracle.py:421] - 开始监听 chain_b 的VCSent事件 (从区块 208925)
+2026-04-12 00:24:11,976 - INFO - 开始监听 chain_b 的VCSent事件 (从区块 208925)
+2026-04-12 00:24:32,343 - VCTransferOracle - INFO - [vc_transfer_oracle.py:616] - 收到停止信号...
+2026-04-12 00:24:32,343 - INFO - 收到停止信号...
+2026-04-12 00:24:32,343 - VCTransferOracle - INFO - [vc_transfer_oracle.py:627] - 正在停止Oracle服务...
+2026-04-12 00:24:32,343 - INFO - 正在停止Oracle服务...
+2026-04-12 00:24:32,343 - VCTransferOracle - INFO - [vc_transfer_oracle.py:633] - ================================================================================
+2026-04-12 00:24:32,343 - INFO - ================================================================================
+2026-04-12 00:24:32,344 - VCTransferOracle - INFO - [vc_transfer_oracle.py:634] - 👋 跨链VC元数据传输Oracle服务已停止
+2026-04-12 00:24:32,344 - INFO - 👋 跨链VC元数据传输Oracle服务已停止
+2026-04-12 00:24:32,344 - VCTransferOracle - INFO - [vc_transfer_oracle.py:635] - ================================================================================
+2026-04-12 00:24:32,344 - INFO - ================================================================================
+✅ 配置文件加载成功: ../config/cross_chain_oracle_config.json
+2026-04-12 00:28:03,835 - VCTransferOracle - INFO - [vc_transfer_oracle.py:132] - 状态文件加载成功: 65 条已处理记录
+2026-04-12 00:28:03,835 - INFO - 状态文件加载成功: 65 条已处理记录
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:100] - ================================================================================
+2026-04-12 00:28:03,836 - INFO - ================================================================================
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:101] - 跨链VC元数据传输Oracle服务初始化
+2026-04-12 00:28:03,836 - INFO - 跨链VC元数据传输Oracle服务初始化
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:102] - Oracle DID: 6VDa4HBhtvFaWVf21xRFmf
+2026-04-12 00:28:03,836 - INFO - Oracle DID: 6VDa4HBhtvFaWVf21xRFmf
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:103] - Oracle地址: 0x85303A9AeD94B8C58a8cD5E6fBB80725488EA434
+2026-04-12 00:28:03,836 - INFO - Oracle地址: 0x85303A9AeD94B8C58a8cD5E6fBB80725488EA434
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:104] - ================================================================================
+2026-04-12 00:28:03,836 - INFO - ================================================================================
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:152] - 初始化区块链连接...
+2026-04-12 00:28:03,836 - INFO - 初始化区块链连接...
+2026-04-12 00:28:03,836 - VCTransferOracle - INFO - [vc_transfer_oracle.py:156] - 连接 Chain A...
+2026-04-12 00:28:03,836 - INFO - 连接 Chain A...
+2026-04-12 00:28:03,837 - INFO - 🔗 初始化 Chain A 连接: http://localhost:8545
+2026-04-12 00:28:03,863 - VCTransferOracle - INFO - [vc_transfer_oracle.py:191] - ✅ Chain A 连接成功 (Chain ID: 2023, 当前区块: 355952)
+2026-04-12 00:28:03,863 - INFO - ✅ Chain A 连接成功 (Chain ID: 2023, 当前区块: 355952)
+2026-04-12 00:28:03,863 - VCTransferOracle - INFO - [vc_transfer_oracle.py:156] - 连接 Chain B...
+2026-04-12 00:28:03,863 - INFO - 连接 Chain B...
+2026-04-12 00:28:03,865 - INFO - 🔗 初始化 Chain B 连接: http://localhost:8555
+2026-04-12 00:28:03,888 - VCTransferOracle - INFO - [vc_transfer_oracle.py:191] - ✅ Chain B 连接成功 (Chain ID: 2024, 当前区块: 208971)
+2026-04-12 00:28:03,888 - INFO - ✅ Chain B 连接成功 (Chain ID: 2024, 当前区块: 208971)
+2026-04-12 00:28:03,889 - VCTransferOracle - INFO - [vc_transfer_oracle.py:570] - ================================================================================
+2026-04-12 00:28:03,889 - INFO - ================================================================================
+2026-04-12 00:28:03,889 - VCTransferOracle - INFO - [vc_transfer_oracle.py:571] - 开始扫描历史遗留 VC...
+2026-04-12 00:28:03,889 - INFO - 开始扫描历史遗留 VC...
+2026-04-12 00:28:03,889 - VCTransferOracle - INFO - [vc_transfer_oracle.py:572] - ================================================================================
+2026-04-12 00:28:03,889 - INFO - ================================================================================
+2026-04-12 00:28:03,889 - VCTransferOracle - INFO - [vc_transfer_oracle.py:485] - 开始扫描 chain_a 的历史遗留 VC...
+2026-04-12 00:28:03,889 - INFO - 开始扫描 chain_a 的历史遗留 VC...
+2026-04-12 00:28:03,908 - VCTransferOracle - INFO - [vc_transfer_oracle.py:495] - chain_a sendList 中有 66 个 VC
+2026-04-12 00:28:03,908 - INFO - chain_a sendList 中有 66 个 VC
+2026-04-12 00:28:03,909 - VCTransferOracle - INFO - [vc_transfer_oracle.py:217] - 从 chain_a Bridge合约获取VC元数据: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8
+2026-04-12 00:28:03,909 - INFO - 从 chain_a Bridge合约获取VC元数据: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8
+2026-04-12 00:28:03,920 - VCTransferOracle - INFO - [vc_transfer_oracle.py:250] - ✅ 获取VC元数据成功: 名称=质检报告-CON-2024-001 (UUID: 1f7e97a7-1b22-436e-aae3-8b3719853913), 目标链=chain_b
+2026-04-12 00:28:03,920 - INFO - ✅ 获取VC元数据成功: 名称=质检报告-CON-2024-001 (UUID: 1f7e97a7-1b22-436e-aae3-8b3719853913), 目标链=chain_b
+2026-04-12 00:28:03,932 - VCTransferOracle - INFO - [vc_transfer_oracle.py:542] - 发现未传输的 VC: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8 -> chain_b
+2026-04-12 00:28:03,932 - INFO - 发现未传输的 VC: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8 -> chain_b
+2026-04-12 00:28:03,932 - VCTransferOracle - INFO - [vc_transfer_oracle.py:277] - 写入VC元数据到 chain_b...
+2026-04-12 00:28:03,932 - INFO - 写入VC元数据到 chain_b...
+2026-04-12 00:28:03,939 - VCTransferOracle - INFO - [vc_transfer_oracle.py:291] - 调用 receiveFromCrossChain: vcHash=3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8
+2026-04-12 00:28:03,939 - INFO - 调用 receiveFromCrossChain: vcHash=3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8
+2026-04-12 00:28:03,998 - VCTransferOracle - INFO - [vc_transfer_oracle.py:314] - 交易已发送: 0x2a69e859e5260de8ad7b4271d5de7bbea5b528fdc180ccb045de08a67eb1c585
+2026-04-12 00:28:03,998 - INFO - 交易已发送: 0x2a69e859e5260de8ad7b4271d5de7bbea5b528fdc180ccb045de08a67eb1c585
+2026-04-12 00:28:06,592 - VCTransferOracle - INFO - [vc_transfer_oracle.py:323] - ✅ 写入目标链成功: tx=0x2a69e859e5260de8ad7b4271d5de7bbea5b528fdc180ccb045de08a67eb1c585, block=208972, gas_used=358874
+2026-04-12 00:28:06,592 - INFO - ✅ 写入目标链成功: tx=0x2a69e859e5260de8ad7b4271d5de7bbea5b528fdc180ccb045de08a67eb1c585, block=208972, gas_used=358874
+2026-04-12 00:28:06,592 - VCTransferOracle - INFO - [vc_transfer_oracle.py:551] - ✅ 历史遗留 VC 传输完成: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8, chain_a -> chain_b
+2026-04-12 00:28:06,592 - INFO - ✅ 历史遗留 VC 传输完成: 3c1ae1442f02dd9610c354aea3e33667f45259e588d54695cd65f8241c599db8, chain_a -> chain_b
+2026-04-12 00:28:06,592 - VCTransferOracle - INFO - [vc_transfer_oracle.py:562] - ✅ chain_a 历史遗留 VC 扫描完成，处理了 1 个未传输的 VC
+2026-04-12 00:28:06,592 - INFO - ✅ chain_a 历史遗留 VC 扫描完成，处理了 1 个未传输的 VC
+2026-04-12 00:28:06,592 - VCTransferOracle - INFO - [vc_transfer_oracle.py:485] - 开始扫描 chain_b 的历史遗留 VC...
+2026-04-12 00:28:06,592 - INFO - 开始扫描 chain_b 的历史遗留 VC...
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:492] - chain_b sendList 为空，无需扫描
+2026-04-12 00:28:06,614 - INFO - chain_b sendList 为空，无需扫描
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:577] - ================================================================================
+2026-04-12 00:28:06,614 - INFO - ================================================================================
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:578] - 历史遗留 VC 扫描完成，启动事件监听...
+2026-04-12 00:28:06,614 - INFO - 历史遗留 VC 扫描完成，启动事件监听...
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:579] - ================================================================================
+2026-04-12 00:28:06,614 - INFO - ================================================================================
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:582] - 启动事件监听任务...
+2026-04-12 00:28:06,614 - INFO - 启动事件监听任务...
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:594] - ================================================================================
+2026-04-12 00:28:06,614 - INFO - ================================================================================
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:595] - 🚀 跨链VC元数据传输Oracle服务已启动
+2026-04-12 00:28:06,614 - INFO - 🚀 跨链VC元数据传输Oracle服务已启动
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:596] - 监听链: ['chain_a', 'chain_b']
+2026-04-12 00:28:06,614 - INFO - 监听链: ['chain_a', 'chain_b']
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:597] - 轮询间隔: 5 秒
+2026-04-12 00:28:06,614 - INFO - 轮询间隔: 5 秒
+2026-04-12 00:28:06,614 - VCTransferOracle - INFO - [vc_transfer_oracle.py:598] - ================================================================================
+2026-04-12 00:28:06,614 - INFO - ================================================================================
+2026-04-12 00:28:06,615 - VCTransferOracle - INFO - [vc_transfer_oracle.py:421] - 开始监听 chain_a 的VCSent事件 (从区块 355952)
+2026-04-12 00:28:06,615 - INFO - 开始监听 chain_a 的VCSent事件 (从区块 355952)
+2026-04-12 00:28:06,626 - VCTransferOracle - INFO - [vc_transfer_oracle.py:421] - 开始监听 chain_b 的VCSent事件 (从区块 208971)
+2026-04-12 00:28:06,626 - INFO - 开始监听 chain_b 的VCSent事件 (从区块 208971)
+2026-04-12 00:28:07,585 - VCTransferOracle - INFO - [vc_transfer_oracle.py:616] - 收到停止信号...
+2026-04-12 00:28:07,585 - INFO - 收到停止信号...
+2026-04-12 00:28:07,585 - VCTransferOracle - INFO - [vc_transfer_oracle.py:627] - 正在停止Oracle服务...
+2026-04-12 00:28:07,585 - INFO - 正在停止Oracle服务...
+2026-04-12 00:28:07,586 - VCTransferOracle - INFO - [vc_transfer_oracle.py:633] - ================================================================================
+2026-04-12 00:28:07,586 - INFO - ================================================================================
+2026-04-12 00:28:07,586 - VCTransferOracle - INFO - [vc_transfer_oracle.py:634] - 👋 跨链VC元数据传输Oracle服务已停止
+2026-04-12 00:28:07,586 - INFO - 👋 跨链VC元数据传输Oracle服务已停止
+2026-04-12 00:28:07,586 - VCTransferOracle - INFO - [vc_transfer_oracle.py:635] - ================================================================================
+2026-04-12 00:28:07,586 - INFO - ================================================================================
+✅ 配置文件加载成功: ../config/cross_chain_oracle_config.json

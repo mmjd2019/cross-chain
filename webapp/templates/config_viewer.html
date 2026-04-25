@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置文件查看器 - 跨链VC系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/config_viewer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link">← 返回主页</a>
+                    <h1>📁 配置文件查看器</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">检查中...</span>
+                    </div>
+                    <button class="btn btn-primary" id="refreshAllBtn" onclick="refreshAll()">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">全部刷新</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-container">
+            <!-- 左侧配置文件导航 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>配置文件分类</h2>
+                </div>
+
+                <!-- DID注册配置 -->
+                <div class="config-category" id="didConfigCategory">
+                    <div class="category-header" onclick="toggleCategory('did')">
+                        <span class="category-icon">🆔</span>
+                        <span class="category-title">DID注册配置</span>
+                        <span class="category-count" id="didCount">4</span>
+                        <span class="category-arrow">▼</span>
+                    </div>
+                    <div class="config-list" id="didConfigList">
+                        <div class="config-item" data-config="did" data-file="did.json" onclick="loadConfig('did', 'did.json')">
+                            <div class="config-name">did.json</div>
+                            <div class="config-desc">50个确定性DID</div>
+                        </div>
+                        <div class="config-item" data-config="did" data-file="address.json" onclick="loadConfig('did', 'address.json')">
+                            <div class="config-name">address.json</div>
+                            <div class="config-desc">账户地址信息</div>
+                        </div>
+                        <div class="config-item" data-config="did" data-file="did_address_map.json" onclick="loadConfig('did', 'did_address_map.json')">
+                            <div class="config-name">did_address_map.json</div>
+                            <div class="config-desc">DID-Address映射</div>
+                        </div>
+                        <div class="config-item" data-config="did" data-file="did_registration_result.json" onclick="loadConfig('did', 'did_registration_result.json')">
+                            <div class="config-name">did_registration_result.json</div>
+                            <div class="config-desc">链上注册结果</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schema/Cred-Def配置 -->
+                <div class="config-category" id="schemaConfigCategory">
+                    <div class="category-header" onclick="toggleCategory('schema')">
+                        <span class="category-icon">📋</span>
+                        <span class="category-title">Schema/Cred-Def配置</span>
+                        <span class="category-count" id="schemaCount">2</span>
+                        <span class="category-arrow">▼</span>
+                    </div>
+                    <div class="config-list" id="schemaConfigList">
+                        <div class="config-item" data-config="schema" data-file="vc_config.json" onclick="loadConfig('schema', 'vc_config.json')">
+                            <div class="config-name">vc_config.json</div>
+                            <div class="config-desc">VC Schema定义</div>
+                        </div>
+                        <div class="config-item" data-config="schema" data-file="schema_cred_def_batch_results.json" onclick="loadConfig('schema', 'schema_cred_def_batch_results.json')">
+                            <div class="config-name">schema_cred_def_batch_results.json</div>
+                            <div class="config-desc">Schema/CredDef创建结果</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智能合约配置 -->
+                <div class="config-category" id="contractConfigCategory">
+                    <div class="category-header" onclick="toggleCategory('contract')">
+                        <span class="category-icon">📜</span>
+                        <span class="category-title">智能合约配置</span>
+                        <span class="category-count" id="contractCount">1</span>
+                        <span class="category-arrow">▼</span>
+                    </div>
+                    <div class="config-list" id="contractConfigList">
+                        <div class="config-item" data-config="contract" data-file="deployed_contracts_config.json" onclick="loadConfig('contract', 'deployed_contracts_config.json')">
+                            <div class="config-name">deployed_contracts_config.json</div>
+                            <div class="config-desc">已部署合约配置</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oracle服务配置 -->
+                <div class="config-category" id="oracleConfigCategory">
+                    <div class="category-header" onclick="toggleCategory('oracle')">
+                        <span class="category-icon">🔮</span>
+                        <span class="category-title">Oracle服务配置</span>
+                        <span class="category-count" id="oracleCount">4</span>
+                        <span class="category-arrow">▼</span>
+                    </div>
+                    <div class="config-list" id="oracleConfigList">
+                        <div class="config-item" data-config="oracle" data-file="vc_issuance_config.json" onclick="loadConfig('oracle', 'vc_issuance_config.json')">
+                            <div class="config-name">vc_issuance_config.json</div>
+                            <div class="config-desc">VC发行Oracle配置</div>
+                        </div>
+                        <div class="config-item" data-config="oracle" data-file="vp_verification_oracle_config.json" onclick="loadConfig('oracle', 'vp_verification_oracle_config.json')">
+                            <div class="config-name">vp_verification_oracle_config.json</div>
+                            <div class="config-desc">VP验证Oracle配置</div>
+                        </div>
+                        <div class="config-item" data-config="oracle_config" data-file="cross_chain_oracle_config.json" onclick="loadConfig('oracle_config', 'cross_chain_oracle_config.json')">
+                            <div class="config-name">cross_chain_oracle_config.json</div>
+                            <div class="config-desc">跨链传输Oracle配置</div>
+                        </div>
+                        <div class="config-item" data-config="oracle_config" data-file="blockchain_config.json" onclick="loadConfig('oracle_config', 'blockchain_config.json')">
+                            <div class="config-name">blockchain_config.json</div>
+                            <div class="config-desc">区块链访问配置</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右侧内容区 -->
+            <main class="content">
+                <!-- 概览卡片 -->
+                <div class="summary-cards" id="summaryCards">
+                    <div class="summary-card">
+                        <div class="card-icon">🆔</div>
+                        <div class="card-content">
+                            <div class="card-label">DID配置</div>
+                            <div class="card-value" id="didSummary">加载中...</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">📋</div>
+                        <div class="card-content">
+                            <div class="card-label">Schema配置</div>
+                            <div class="card-value" id="schemaSummary">加载中...</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">📜</div>
+                        <div class="card-content">
+                            <div class="card-label">合约配置</div>
+                            <div class="card-value" id="contractSummary">加载中...</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🔮</div>
+                        <div class="card-content">
+                            <div class="card-label">Oracle配置</div>
+                            <div class="card-value" id="oracleSummary">加载中...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 配置文件详情 -->
+                <div class="config-detail" id="configDetail">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">📄</div>
+                        <h2>请从左侧选择一个配置文件</h2>
+                        <p>点击配置文件名称查看详细内容</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">正在读取配置文件...</p>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentConfig = null;
+        let statusCheckInterval = null;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSummary();
+            startStatusCheck();
+        });
+
+        // 切换分类展开/收起
+        function toggleCategory(category) {
+            const list = document.getElementById(category + 'ConfigList');
+            const arrow = document.querySelector(`#${category}ConfigCategory .category-arrow`);
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                arrow.textContent = '▼';
+            } else {
+                list.style.display = 'none';
+                arrow.textContent = '▶';
+            }
+        }
+
+        // 加载摘要数据
+        async function loadSummary() {
+            try {
+                const response = await fetch('/api/config-viewer/summary');
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast('error', '无法加载数据: ' + data.error);
+                    return;
+                }
+
+                updateSummary(data);
+            } catch (error) {
+                showToast('error', '加载失败: ' + error.message);
+                setSummaryError();
+            }
+        }
+
+        // 更新摘要
+        function updateSummary(data) {
+            const didSummary = data.did?.exists ? '✅ 正常' : '❌ 缺失';
+            const schemaSummary = data.schema?.exists ? '✅ 正常' : '❌ 缺失';
+            const contractSummary = data.contract?.exists ? '✅ 正常' : '❌ 缺失';
+            const oracleSummary = data.oracle?.exists ? '✅ 正常' : '❌ 缺失';
+
+            document.getElementById('didSummary').textContent = didSummary;
+            document.getElementById('schemaSummary').textContent = schemaSummary;
+            document.getElementById('contractSummary').textContent = contractSummary;
+            document.getElementById('oracleSummary').textContent = oracleSummary;
+        }
+
+        function setSummaryError() {
+            document.getElementById('didSummary').textContent = '❓';
+            document.getElementById('schemaSummary').textContent = '❓';
+            document.getElementById('contractSummary').textContent = '❓';
+            document.getElementById('oracleSummary').textContent = '❓';
+        }
+
+        // 加载配置文件详情
+        async function loadConfig(category, filename, subdir = null) {
+            showLoading(true, `正在读取 ${filename}...`);
+
+            // 高亮选中项
+            document.querySelectorAll('.config-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.config-item[data-file="${filename}"]`)?.classList.add('active');
+
+            try {
+                const subdirParam = subdir ? `?subdir=${subdir}` : '';
+                const response = await fetch(`/api/config-viewer/config/${category}/${filename}${subdirParam}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast('error', data.error);
+                    renderConfigError(filename, data.error);
+                    return;
+                }
+
+                currentConfig = data;
+                renderConfigDetail(data);
+            } catch (error) {
+                showToast('error', '加载失败: ' + error.message);
+                renderConfigError(filename, error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 渲染配置文件详情
+        function renderConfigDetail(data) {
+            const container = document.getElementById('configDetail');
+            const content = data.content || {};
+
+            let html = `
+                <div class="config-header">
+                    <div class="config-title">
+                        <h2>${data.filename}</h2>
+                        <span class="config-category-tag">${getCategoryName(data.category)}</span>
+                    </div>
+                    <div class="config-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">文件路径</span>
+                            <span class="meta-value">${data.filepath}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">大小</span>
+                            <span class="meta-value">${formatFileSize(data.size)}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">修改时间</span>
+                            <span class="meta-value">${formatTime(data.modified)}</span>
+                        </div>
+                    </div>
+                    <button class="btn-refresh-single" onclick="loadConfig('${data.category}', '${data.filename}'${data.subdir ? `, '${data.subdir}'` : ''})">
+                        🔄 刷新此文件
+                    </button>
+                </div>
+            `;
+
+            // 根据不同配置文件类型渲染不同内容
+            html += renderConfigContent(data.category, data.filename, content);
+
+            container.innerHTML = html;
+        }
+
+        // 根据配置类型渲染内容
+        function renderConfigContent(category, filename, content) {
+            switch(category) {
+                case 'did':
+                    return renderDIDConfig(filename, content);
+                case 'schema':
+                    return renderSchemaConfig(filename, content);
+                case 'contract':
+                    return renderContractConfig(filename, content);
+                case 'oracle':
+                case 'oracle_config':
+                    return renderOracleConfig(filename, content);
+                default:
+                    return renderGenericContent(content);
+            }
+        }
+
+        // DID配置渲染
+        function renderDIDConfig(filename, content) {
+            let html = '<section class="section"><h3 class="section-title">📋 配置内容</h3>';
+
+            switch(filename) {
+                case 'did.json':
+                    // 处理数组格式的did.json
+                    const didList = Array.isArray(content) ? content : [];
+                    const registeredCount = didList.filter(d => d.registered).length;
+
+                    html += `
+                        <div class="config-info-grid">
+                            <div class="info-card">
+                                <div class="info-label">总DID数</div>
+                                <div class="info-value">${didList.length}</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">已注册</div>
+                                <div class="info-value">${registeredCount}</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">未注册</div>
+                                <div class="info-value">${didList.length - registeredCount}</div>
+                            </div>
+                        </div>
+                        <div class="did-list">
+                            <h4>DID列表 (前10个)</h4>
+                            ${renderDIDArray(didList.slice(0, 10))}
+                        </div>
+                    `;
+                    break;
+
+                case 'address.json':
+                    // 处理实际的address.json结构
+                    const besuNodes = content.besu_nodes || {};
+                    const nodeCount = Object.keys(besuNodes).filter(k => k.startsWith('node')).length;
+                    const userAccountsData = content.user_accounts?.accounts || [];
+                    const userCount = Array.isArray(userAccountsData) ? userAccountsData.length : Object.keys(userAccountsData).length;
+
+                    html += `
+                        <div class="config-info-grid">
+                            <div class="info-card">
+                                <div class="info-label">Besu节点</div>
+                                <div class="info-value">${nodeCount}</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">用户账户</div>
+                                <div class="info-value">${userCount}</div>
+                            </div>
+                            ${content.summary ? `
+                            <div class="info-card">
+                                <div class="info-label">总合约</div>
+                                <div class="info-value">${content.summary.total_contracts || 0}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="address-list">
+                            <h4>Besu节点</h4>
+                            ${renderBesuNodes(besuNodes)}
+                            <h4>用户账户 (前5个)</h4>
+                            ${renderUserAccounts(userAccountsData)}
+                        </div>
+                    `;
+                    break;
+
+                case 'did_address_map.json':
+                    const mappings = content.mappings || [];
+                    html += `
+                        <div class="config-info-grid">
+                            <div class="info-card">
+                                <div class="info-label">映射数量</div>
+                                <div class="info-value">${mappings.length}</div>
+                            </div>
+                        </div>
+                        <div class="mapping-list">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>DID</th>
+                                        <th>地址</th>
+                                        <th>角色</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${mappings.slice(0, 10).map((m, i) => `
+                                        <tr>
+                                            <td>${i + 1}</td>
+                                            <td><code>${formatDID(m.did)}</code></td>
+                                            <td><code>${formatAddress(m.address)}</code></td>
+                                            <td>${m.role || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+
+                case 'did_registration_result.json':
+                    const chainA = content.chain_a || {};
+                    const chainB = content.chain_b || {};
+                    const chainAResults = chainA.results || [];
+                    const chainBResults = chainB.results || [];
+                    html += `
+                        <div class="registration-results">
+                            <div class="chain-result">
+                                <h4>Chain A</h4>
+                                <div class="result-item">
+                                    <span class="result-label">总计</span>
+                                    <span class="result-value">${chainA.total || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">成功</span>
+                                    <span class="result-value success">${chainA.success || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">失败</span>
+                                    <span class="result-value error">${chainA.failed || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">合约地址</span>
+                                    <span class="result-value"><code>${formatAddress(chainA.contract_address)}</code></span>
+                                </div>
+                                ${chainAResults.length > 0 ? `
+                                <div class="result-details">
+                                    <h5>注册结果 (前5个)</h5>
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>DID</th>
+                                                <th>地址</th>
+                                                <th>状态</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${chainAResults.slice(0, 5).map(r => `
+                                                <tr>
+                                                    <td><code>${formatDID(r.did)}</code></td>
+                                                    <td><code>${formatAddress(r.address)}</code></td>
+                                                    <td class="${r.status === 'success' ? 'success' : 'error'}">${r.status}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <div class="chain-result">
+                                <h4>Chain B</h4>
+                                <div class="result-item">
+                                    <span class="result-label">总计</span>
+                                    <span class="result-value">${chainB.total || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">成功</span>
+                                    <span class="result-value success">${chainB.success || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">失败</span>
+                                    <span class="result-value error">${chainB.failed || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">合约地址</span>
+                                    <span class="result-value"><code>${formatAddress(chainB.contract_address)}</code></span>
+                                </div>
+                                ${chainBResults.length > 0 ? `
+                                <div class="result-details">
+                                    <h5>注册结果 (前5个)</h5>
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>DID</th>
+                                                <th>地址</th>
+                                                <th>状态</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${chainBResults.slice(0, 5).map(r => `
+                                                <tr>
+                                                    <td><code>${formatDID(r.did)}</code></td>
+                                                    <td><code>${formatAddress(r.address)}</code></td>
+                                                    <td class="${r.status === 'success' ? 'success' : 'error'}">${r.status}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    html += renderGenericContent(content);
+            }
+
+            html += '</section>';
+            return html;
+        }
+
+        // Schema配置渲染
+        function renderSchemaConfig(filename, content) {
+            let html = '<section class="section"><h3 class="section-title">📋 配置内容</h3>';
+
+            if (filename === 'vc_config.json') {
+                // schemas是对象，不是数组
+                const schemas = content.schemas || {};
+                const schemaEntries = Object.entries(schemas).filter(([k]) => k.startsWith('schema'));
+
+                html += `
+                    <div class="config-info-grid">
+                        <div class="info-card">
+                            <div class="info-label">Schema数量</div>
+                            <div class="info-value">${schemaEntries.length}</div>
+                        </div>
+                    </div>
+                    <div class="schema-list">
+                        ${schemaEntries.map(([key, schema]) => `
+                            <div class="schema-card">
+                                <h4>${schema.name || key}</h4>
+                                <div class="schema-meta">
+                                    <span>版本: ${schema.version || 'N/A'}</span>
+                                    <span>属性数: ${schema.attributes?.length || 0}</span>
+                                </div>
+                                ${schema.schema_id ? `<div class="schema-meta">Schema ID: <code>${formatID(schema.schema_id)}</code></div>` : ''}
+                                ${schema.cred_def_id ? `<div class="schema-meta">CredDef ID: <code>${formatID(schema.cred_def_id)}</code></div>` : ''}
+                                <div class="schema-attributes">
+                                    <strong>属性:</strong> ${(schema.attributes || []).join(', ') || '无'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (filename === 'schema_cred_def_batch_results.json') {
+                // schemas是数组，不是results
+                const schemas = content.schemas || [];
+                html += `
+                    <div class="config-info-grid">
+                        <div class="info-card">
+                            <div class="info-label">成功Schemas</div>
+                            <div class="info-value">${content.successful_schemas || 0}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">成功CredDefs</div>
+                            <div class="info-value">${content.successful_cred_defs || 0}</div>
+                        </div>
+                    </div>
+                    <div class="schema-results">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Schema名称</th>
+                                    <th>Schema ID</th>
+                                    <th>CredDef ID</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${schemas.map(s => `
+                                    <tr>
+                                        <td>${s.name || s.key}</td>
+                                        <td><code>${formatID(s.schema_id || s.schema_result?.schema_id)}</code></td>
+                                        <td><code>${formatID(s.cred_def_id || s.cred_def_result?.cred_def_id)}</code></td>
+                                        <td>${s.schema_result?.success || s.cred_def_result?.success ? '✅' : '❌'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                html += renderGenericContent(content);
+            }
+
+            html += '</section>';
+            return html;
+        }
+
+        // 合约配置渲染
+        function renderContractConfig(filename, content) {
+            let html = '<section class="section"><h3 class="section-title">📋 配置内容</h3>';
+
+            if (filename === 'deployed_contracts_config.json') {
+                // 只显示chain_a和chain_b
+                const chains = ['chain_a', 'chain_b'];
+                html += `
+                    <div class="chain-contracts">
+                        ${chains.map(chainKey => {
+                            const data = content[chainKey] || {};
+                            const contracts = data.contracts || {};
+                            return `
+                            <div class="chain-section-detail">
+                                <h4>${data.name || chainKey}</h4>
+                                <div class="chain-info">
+                                    <span>RPC: ${data.rpc_url || 'N/A'}</span>
+                                    <span>Chain ID: ${data.chain_id || 'N/A'}</span>
+                                    <span>类型: ${data.chain_type || 'N/A'}</span>
+                                </div>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>合约名</th>
+                                            <th>地址</th>
+                                            <th>描述</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${Object.entries(contracts).map(([name, contractData]) => {
+                                            const addr = typeof contractData === 'object' ? contractData.address : contractData;
+                                            const desc = typeof contractData === 'object' ? contractData.description : '';
+                                            return `
+                                            <tr>
+                                                <td>${name}</td>
+                                                <td><code>${formatAddress(addr)}</code></td>
+                                                <td>${desc || '-'}</td>
+                                            </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}).join('')}
+                    </div>
+                `;
+            } else if (filename === 'cross_chain_config.json') {
+                // 此文件不存在，显示占位内容
+                html += `
+                    <div class="error-message">
+                        <div class="error-icon">📄</div>
+                        <h2>cross_chain_config.json</h2>
+                        <p>此配置文件暂不存在</p>
+                        <p class="error-text">跨链配置信息位于 deployed_contracts_config.json 中</p>
+                    </div>
+                `;
+            } else {
+                html += renderGenericContent(content);
+            }
+
+            html += '</section>';
+            return html;
+        }
+
+        // Oracle配置渲染
+        function renderOracleConfig(filename, content) {
+            let html = '<section class="section"><h3 class="section-title">📋 配置内容</h3>';
+
+            if (filename === 'vc_issuance_config.json') {
+                const acapy = content.acapy || {};
+                const service = content.service || {};
+                const blockchain = content.blockchain || {};
+                html += `
+                    <div class="oracle-config">
+                        <h4>VC发行Oracle配置</h4>
+                        <div class="config-details">
+                            <div class="detail-row">
+                                <span class="detail-label">服务端口</span>
+                                <span class="detail-value">${service.port || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Issuer Admin URL</span>
+                                <span class="detail-value">${acapy.issuer?.admin_url || acapy.issuer?.endpoint || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Holder Admin URL</span>
+                                <span class="detail-value">${acapy.holder?.admin_url || acapy.holder?.endpoint || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Chain RPC</span>
+                                <span class="detail-value">${blockchain.rpc_url || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Chain ID</span>
+                                <span class="detail-value">${blockchain.chain_id || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <h5>配置的VC类型 (${Object.keys(content.vc_types || {}).length})</h5>
+                        <div class="schema-configs">
+                            ${Object.keys(content.vc_types || {}).map(type => `
+                                <div class="mini-schema-card">
+                                    <strong>${type}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (filename === 'vp_verification_oracle_config.json') {
+                const acapy = content.acapy || {};
+                const service = content.service || {};
+                const blockchain = content.blockchain || {};
+                html += `
+                    <div class="oracle-config">
+                        <h4>VP验证Oracle配置</h4>
+                        <div class="config-details">
+                            <div class="detail-row">
+                                <span class="detail-label">服务端口</span>
+                                <span class="detail-value">${service.port || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Verifier Admin URL</span>
+                                <span class="detail-value">${acapy.verifier?.admin_url || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Holder Admin URL</span>
+                                <span class="detail-value">${acapy.holder?.admin_url || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Chain RPC</span>
+                                <span class="detail-value">${blockchain.rpc_url || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <h5>配置的VC类型 (${Object.keys(content.vc_types || {}).length})</h5>
+                        <div class="schema-configs">
+                            ${Object.entries(content.vc_types || {}).map(([name, vcType]) => `
+                                <div class="mini-schema-card">
+                                    <strong>${name}</strong>
+                                    <span>CredDef: ${formatID(vcType.cred_def_id)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (filename === 'cross_chain_oracle_config.json') {
+                const oracle = content.oracle || {};
+                const chains = content.chains || {};
+                html += `
+                    <div class="oracle-config">
+                        <h4>跨链传输Oracle配置</h4>
+                        <div class="config-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Oracle账户</span>
+                                <span class="detail-value"><code>${formatAddress(oracle.address)}</code></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">私钥</span>
+                                <span class="detail-value"><code>${oracle.private_key ? oracle.private_key.slice(0, 10) + '...' : 'N/A'}</code></span>
+                            </div>
+                        </div>
+                        <h5>配置的链 (${Object.keys(chains).length})</h5>
+                        <div class="schema-configs">
+                            ${Object.entries(chains).map(([name, chain]) => `
+                                <div class="mini-schema-card">
+                                    <strong>${name}</strong>
+                                    <span>RPC: ${chain.rpc_url || 'N/A'}</span>
+                                    <span>Bridge: ${formatAddress(chain.bridge_address)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (filename === 'blockchain_config.json') {
+                const chains = content.chains || {};
+                const bridge = content.bridge || {};
+                html += `
+                    <div class="oracle-config">
+                        <h4>区块链访问配置</h4>
+                        <h5>链配置</h5>
+                        <div class="config-details">
+                            ${Object.entries(chains).map(([name, chain]) => `
+                                <div class="detail-row">
+                                    <span class="detail-label">${name}</span>
+                                    <span class="detail-value">RPC: ${chain.rpc_url || 'N/A'}, Chain ID: ${chain.chain_id || 'N/A'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <h5>跨链桥配置</h5>
+                        <div class="config-details">
+                            ${Object.entries(bridge).map(([name, value]) => `
+                                <div class="detail-row">
+                                    <span class="detail-label">${name}</span>
+                                    <span class="detail-value">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += renderGenericContent(content);
+            }
+
+            html += '</section>';
+            return html;
+        }
+
+        // 通用内容渲染
+        function renderGenericContent(content) {
+            return `
+                <div class="json-viewer">
+                    <pre><code>${JSON.stringify(content, null, 2)}</code></pre>
+                </div>
+            `;
+        }
+
+        // 渲染错误
+        function renderConfigError(filename, error) {
+            const container = document.getElementById('configDetail');
+            container.innerHTML = `
+                <div class="error-message">
+                    <div class="error-icon">❌</div>
+                    <h2>加载失败</h2>
+                    <p>${filename}</p>
+                    <p class="error-text">${error}</p>
+                </div>
+            `;
+        }
+
+        // 辅助函数
+        function getCategoryName(category) {
+            const names = {
+                'did': 'DID注册',
+                'schema': 'Schema/Cred-Def',
+                'contract': '智能合约',
+                'oracle': 'Oracle服务'
+            };
+            return names[category] || category;
+        }
+
+        function renderDIDList(dids) {
+            return `
+                <div class="did-items">
+                    ${dids.map(did => `<code>${formatDID(did)}</code>`).join('')}
+                </div>
+            `;
+        }
+
+        function renderAddressList(accounts) {
+            return `
+                <div class="address-items">
+                    ${accounts.map(acc => `
+                        <div class="address-item">
+                            <span><strong>地址:</strong> <code>${formatAddress(acc.address)}</code></span>
+                            <span><strong>私钥:</strong> <code>${acc.private_key?.slice(0, 10)}...</code></span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderBesuNodes(besuNodes) {
+            const nodes = Object.entries(besuNodes)
+                .filter(([key]) => key.startsWith('node'))
+                .slice(0, 4);
+
+            return `
+                <div class="address-items">
+                    ${nodes.map(([key, node]) => `
+                        <div class="address-item">
+                            <span><strong>${key}:</strong> <code>${formatAddress(node.address || node.enode_address || key)}</code></span>
+                            ${node.enode_url ? `<span><strong>Enode:</strong> <code>${node.enode_url.slice(0, 30)}...</code></span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderUserAccounts(accountsData) {
+            let accounts = [];
+
+            // 处理不同的数据结构
+            if (Array.isArray(accountsData)) {
+                accounts = accountsData;
+            } else if (typeof accountsData === 'object') {
+                accounts = Object.values(accountsData);
+            }
+
+            const displayAccounts = accounts.slice(0, 5);
+
+            return `
+                <div class="address-items">
+                    ${displayAccounts.map(acc => `
+                        <div class="address-item">
+                            <span><strong>地址:</strong> <code>${formatAddress(acc.address || acc.account_address)}</code></span>
+                            ${acc.private_key ? `<span><strong>私钥:</strong> <code>${acc.private_key.slice(0, 10)}...</code></span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderDIDArray(didArray) {
+            return `
+                <div class="did-items">
+                    ${didArray.map(did => `
+                        <div class="did-item-detail">
+                            <span><strong>DID:</strong> <code>${formatDID(did.did)}</code></span>
+                            <span><strong>Seed:</strong> <code>${did.seed || 'N/A'}</code></span>
+                            <span><strong>已注册:</strong> ${did.registered ? '✅' : '❌'}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function formatDID(did) {
+            if (!did) return 'N/A';
+            if (did.length > 30) return did.slice(0, 15) + '...' + did.slice(-12);
+            return did;
+        }
+
+        function formatAddress(addr) {
+            if (!addr || addr === 'unknown') return 'N/A';
+            if (addr.startsWith('0x') && addr.length > 20) {
+                return addr.slice(0, 6) + '...' + addr.slice(-4);
+            }
+            return addr;
+        }
+
+        function formatTxHash(hash) {
+            if (!hash) return 'N/A';
+            if (hash.startsWith('0x') && hash.length > 20) {
+                return hash.slice(0, 10) + '...' + hash.slice(-8);
+            }
+            return hash;
+        }
+
+        function formatID(id) {
+            if (!id) return 'N/A';
+            if (id.length > 30) return id.slice(0, 15) + '...' + id.slice(-10);
+            return id;
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return 'N/A';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleString('zh-CN');
+        }
+
+        // 全部刷新
+        async function refreshAll() {
+            const btn = document.getElementById('refreshAllBtn');
+            if (btn.disabled) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-icon spinning">🔄</span><span class="btn-text">刷新中...</span>';
+
+            try {
+                showToast('success', '正在刷新所有配置...');
+                await loadSummary();
+
+                // 如果当前有选中的配置，也刷新它
+                if (currentConfig) {
+                    const subdir = currentConfig.subdir;
+                    await loadConfig(currentConfig.category, currentConfig.filename, subdir);
+                }
+
+                showToast('success', '刷新完成');
+            } catch (error) {
+                showToast('error', '刷新失败: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">全部刷新</span>';
+            }
+        }
+
+        // 状态检查
+        function startStatusCheck() {
+            checkStatus();
+            statusCheckInterval = setInterval(checkStatus, 5000);
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/config-viewer/status');
+                const data = await response.json();
+                updateStatusIndicator(data);
+            } catch (error) {
+                console.error('Status check failed:', error);
+            }
+        }
+
+        function updateStatusIndicator(data) {
+            const indicator = document.getElementById('statusIndicator');
+            const dot = indicator.querySelector('.status-dot');
+            const text = indicator.querySelector('.status-text');
+
+            if (data.last_load) {
+                dot.className = 'status-dot success';
+                const time = new Date(data.last_load);
+                text.textContent = '已更新 ' + formatTimeAgo(time);
+            } else {
+                dot.className = 'status-dot error';
+                text.textContent = '暂无数据';
+            }
+        }
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return diff + '秒前';
+            if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+            return date.toLocaleString('zh-CN');
+        }
+
+        function showLoading(show, text = '正在读取配置文件...') {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+    </script>
+</body>
+</html>

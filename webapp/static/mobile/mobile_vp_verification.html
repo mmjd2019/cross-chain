@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VP 验证</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding-bottom: 32px;
+        }
+
+        /* Nav */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .back-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 20px;
+        }
+        .navbar h1 { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+        .navbar .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #ccc;
+        }
+        .navbar .status-dot.online { background: #10b981; }
+        .navbar .status-dot.offline { background: #ef4444; }
+
+        /* Tabs */
+        .vc-tabs {
+            display: flex; gap: 8px; padding: 12px 16px;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .vc-tabs::-webkit-scrollbar { display: none; }
+
+        .vc-tab {
+            flex-shrink: 0; display: flex; flex-direction: column; align-items: center;
+            gap: 4px; padding: 10px 14px; background: white;
+            border: 2px solid transparent; border-radius: 12px;
+            cursor: pointer; min-width: 80px; transition: all 0.2s;
+        }
+        .vc-tab .tab-icon { font-size: 22px; }
+        .vc-tab .tab-name { font-size: 11px; color: #666; font-weight: 500; }
+        .vc-tab.active { border-color: #10b981; background: #ecfdf5; }
+        .vc-tab.active .tab-name { color: #059669; font-weight: 600; }
+
+        .content { padding: 0 16px; }
+
+        /* Section */
+        .section-card {
+            background: white; border-radius: 14px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .section-card h3 {
+            font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #555;
+        }
+
+        /* Holder info */
+        .holder-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 8px;
+            font-size: 12px; background: #f0f0f0; color: #666;
+        }
+        .holder-badge.has-creds { background: #ecfdf5; color: #059669; }
+
+        /* VC Record List */
+        .vc-record {
+            padding: 12px; border: 1.5px solid #eee; border-radius: 10px;
+            margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .vc-record:active { background: #f9f9f9; }
+        .vc-record.selected { border-color: #10b981; background: #f0fdf4; }
+        .vc-record .rec-uuid {
+            font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px;
+        }
+        .vc-record .rec-hash {
+            font-size: 11px; color: #888; font-family: monospace;
+            word-break: break-all; margin-bottom: 4px;
+        }
+        .vc-record .rec-meta {
+            display: flex; justify-content: space-between; font-size: 11px; color: #aaa;
+        }
+
+        /* Predicate & Filter Items */
+        .config-item {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 8px; flex-wrap: wrap;
+        }
+        .config-item input, .config-item select {
+            padding: 7px 8px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+            font-size: 12px; background: #fafafa; min-width: 0;
+        }
+        .config-item input { flex: 1; min-width: 60px; }
+        .config-item select { flex-shrink: 0; }
+        .config-item .remove-btn {
+            width: 28px; height: 28px; border: none; background: #fee2e2;
+            color: #dc2626; border-radius: 6px; font-size: 16px; cursor: pointer;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
+
+        .add-btn {
+            padding: 6px 12px; border: 1.5px dashed #ccc; border-radius: 8px;
+            background: none; color: #888; font-size: 12px; cursor: pointer;
+            width: 100%;
+        }
+
+        /* Empty */
+        .empty-state {
+            text-align: center; padding: 20px 16px; color: #aaa; font-size: 13px;
+        }
+
+        /* Verify Button */
+        .btn-verify {
+            display: block; width: 100%; padding: 14px; border: none; border-radius: 12px;
+            background: #10b981; color: white; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s; margin-top: 16px;
+        }
+        .btn-verify:active { opacity: 0.8; }
+        .btn-verify:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex; flex-direction: column; gap: 12px; margin: 16px 0;
+        }
+        .progress-step {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .step-dot {
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ddd;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: #aaa; flex-shrink: 0;
+        }
+        .step-dot.running { border-color: #3b82f6; color: #3b82f6; animation: pulse 1s infinite; }
+        .step-dot.completed { border-color: #10b981; background: #10b981; color: white; }
+        .step-dot.failed { border-color: #ef4444; background: #ef4444; color: white; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .step-label { font-size: 13px; color: #555; }
+
+        /* Result */
+        .result-card {
+            background: white; border-radius: 14px; margin-bottom: 12px;
+            overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .result-card .result-header {
+            padding: 12px 16px; font-size: 14px; font-weight: 600;
+        }
+        .result-card .result-header.success { background: #ecfdf5; color: #059669; }
+        .result-card .result-header.error { background: #fef2f2; color: #dc2626; }
+        .result-card .result-body { padding: 12px 16px; }
+
+        .info-item {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5; font-size: 13px;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-item .lbl { color: #888; }
+        .info-item .val { color: #333; font-weight: 500; text-align: right; max-width: 65%; word-break: break-all; }
+
+        .attr-list { list-style: none; }
+        .attr-list li {
+            display: flex; justify-content: space-between;
+            padding: 4px 0; font-size: 12px;
+        }
+        .attr-list li .attr-key { color: #888; }
+        .attr-list li .attr-val { color: #333; font-weight: 500; }
+        .satisfied { color: #10b981; font-weight: 600; }
+        .not-satisfied { color: #ef4444; font-weight: 600; }
+
+        /* Overlay */
+        .overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 200; align-items: center; justify-content: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay-box {
+            background: white; border-radius: 16px; padding: 32px 24px;
+            text-align: center; min-width: 200px;
+        }
+        .spinner {
+            width: 36px; height: 36px; border: 3px solid #e0e0e0;
+            border-top-color: #10b981; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .overlay-box p { font-size: 14px; color: #555; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 500;
+            z-index: 300; opacity: 0; transition: all 0.3s; pointer-events: none; max-width: 90%;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #ecfdf5; color: #059669; }
+        .toast.error { background: #fef2f2; color: #dc2626; }
+        .toast.warning { background: #fffbeb; color: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Nav -->
+        <div class="navbar">
+            <a href="/static/mobile/mobile_index.html" class="back-btn">‹</a>
+            <h1>VP 验证</h1>
+            <span class="status-dot" id="oracleDot"></span>
+        </div>
+
+        <!-- VC Type Tabs -->
+        <div class="vc-tabs" id="vcTabs">
+            <div class="vc-tab active" data-type="InspectionReport" onclick="switchType('InspectionReport')">
+                <span class="tab-icon">📋</span>
+                <span class="tab-name">质检报告</span>
+            </div>
+            <div class="vc-tab" data-type="InsuranceContract" onclick="switchType('InsuranceContract')">
+                <span class="tab-icon">🛡️</span>
+                <span class="tab-name">保险合同</span>
+            </div>
+            <div class="vc-tab" data-type="CertificateOfOrigin" onclick="switchType('CertificateOfOrigin')">
+                <span class="tab-icon">📜</span>
+                <span class="tab-name">原产地证明</span>
+            </div>
+            <div class="vc-tab" data-type="BillOfLadingCertificate" onclick="switchType('BillOfLadingCertificate')">
+                <span class="tab-icon">🚢</span>
+                <span class="tab-name">提单</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Holder Info -->
+            <div class="section-card">
+                <h3>Holder 凭证</h3>
+                <div id="holderInfo"><span class="empty-state">加载中...</span></div>
+            </div>
+
+            <!-- Step 1: Select VC Record -->
+            <div class="section-card">
+                <h3>选择 VC 记录 <span id="vcCount" style="font-size:11px; color:#aaa;"></span></h3>
+                <div id="vcRecordList"><span class="empty-state">加载中...</span></div>
+            </div>
+
+            <!-- Step 2: Config -->
+            <div class="section-card" id="configSection" style="display:none;">
+                <h3>验证条件（可选）</h3>
+
+                <div style="margin-bottom:8px;">
+                    <div style="font-size:12px; color:#888; margin-bottom:6px;">谓词条件</div>
+                    <div id="predicateList"><span class="empty-state">无默认谓词</span></div>
+                    <button class="add-btn" onclick="addPredicate()">+ 添加谓词</button>
+                </div>
+
+                <div>
+                    <div style="font-size:12px; color:#888; margin-bottom:6px;">属性过滤器</div>
+                    <div id="filterList"><span class="empty-state">无默认过滤器</span></div>
+                    <button class="add-btn" onclick="addFilter()">+ 添加属性过滤</button>
+                </div>
+
+                <button class="btn-verify" id="verifyBtn" onclick="executeVerification()">
+                    执行验证
+                </button>
+            </div>
+
+            <!-- Progress & Results -->
+            <div id="progressSection" style="display:none;"></div>
+            <div id="resultSection" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-box">
+            <div class="spinner"></div>
+            <p id="overlayText">验证中...</p>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = '/api/vp-verification';
+        let currentVcType = 'InspectionReport';
+        let currentVcHash = null;
+        let currentUuid = null;
+        let vcConfig = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkOracleStatus();
+            loadVcRecords(currentVcType);
+            loadVcConfig(currentVcType);
+            loadHolderCredentials(currentVcType);
+        });
+
+        async function checkOracleStatus() {
+            try {
+                const res = await fetch('http://localhost:7003/api/health');
+                const data = await res.json();
+                document.getElementById('oracleDot').className =
+                    'status-dot ' + (data.status === 'healthy' ? 'online' : 'offline');
+            } catch (e) {
+                document.getElementById('oracleDot').className = 'status-dot offline';
+            }
+        }
+
+        function switchType(vcType) {
+            currentVcType = vcType;
+            currentVcHash = null;
+            currentUuid = null;
+
+            document.querySelectorAll('.vc-tab').forEach(t =>
+                t.classList.toggle('active', t.dataset.type === vcType));
+
+            document.getElementById('configSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+
+            loadVcRecords(vcType);
+            loadVcConfig(vcType);
+            loadHolderCredentials(vcType);
+        }
+
+        // Load VC Records
+        async function loadVcRecords(vcType) {
+            const container = document.getElementById('vcRecordList');
+            container.innerHTML = '<span class="empty-state">加载中...</span>';
+
+            try {
+                const res = await fetch(`${API}/latest-uuids?vc_type=${vcType}`);
+                const data = await res.json();
+
+                if (data.success && data.data[vcType]) {
+                    const records = data.data[vcType];
+                    document.getElementById('vcCount').textContent = `(${records.length}条)`;
+
+                    if (records.length === 0) {
+                        container.innerHTML = '<span class="empty-state">暂无记录</span>';
+                        return;
+                    }
+
+                    container.innerHTML = records.map((rec, i) => `
+                        <div class="vc-record ${i === 0 ? 'selected' : ''}"
+                             data-hash="${rec.vc_hash}" data-uuid="${rec.uuid}"
+                             onclick="selectRecord(this)">
+                            <div class="rec-uuid">UUID: ${rec.uuid.slice(0, 8)}...${rec.uuid.slice(-8)}</div>
+                            <div class="rec-hash">${rec.vc_hash.slice(0, 16)}...${rec.vc_hash.slice(-12)}</div>
+                            <div class="rec-meta">
+                                <span>${rec.original_contract_name || 'N/A'}</span>
+                                <span>${fmtTime(rec.timestamp)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Auto-select first
+                    selectRecord(container.querySelector('.vc-record'));
+                } else {
+                    container.innerHTML = '<span class="empty-state">加载失败</span>';
+                }
+            } catch (e) {
+                container.innerHTML = '<span class="empty-state">加载失败</span>';
+            }
+        }
+
+        function selectRecord(el) {
+            if (!el) return;
+            document.querySelectorAll('.vc-record').forEach(r => r.classList.remove('selected'));
+            el.classList.add('selected');
+
+            currentVcHash = el.dataset.hash;
+            currentUuid = el.dataset.uuid;
+
+            document.getElementById('configSection').style.display = 'block';
+            document.getElementById('configSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Load Config
+        async function loadVcConfig(vcType) {
+            try {
+                const res = await fetch(`${API}/config/${vcType}`);
+                const data = await res.json();
+                if (data.success) {
+                    vcConfig = data;
+                    renderPredicates(data.predicates);
+                    renderFilters(data.attribute_filters);
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        function getAllAttributes() {
+            return vcConfig.all_attributes || [];
+        }
+
+        function renderPredicates(predicates) {
+            const container = document.getElementById('predicateList');
+            if (!predicates || Object.keys(predicates).length === 0) {
+                container.innerHTML = '<span class="empty-state">无默认谓词</span>';
+                return;
+            }
+            container.innerHTML = '';
+            Object.entries(predicates).forEach(([key, pred]) => {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <input type="text" value="${key}" class="pred-key" readonly style="max-width:70px;">
+                    <select class="pred-attr">
+                        ${getAllAttributes().map(a => `<option value="${a}" ${a === pred.attribute ? 'selected' : ''}>${a}</option>`).join('')}
+                    </select>
+                    <select class="pred-op" style="max-width:50px;">
+                        ${['>', '>=', '<', '<=', '==', '!='].map(op => `<option value="${op}" ${op === pred.operator ? 'selected' : ''}>${op}</option>`).join('')}
+                    </select>
+                    <input type="number" value="${pred.value}" class="pred-value" style="max-width:60px;">
+                    <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderFilters(filters) {
+            const container = document.getElementById('filterList');
+            if (!filters || Object.keys(filters).length === 0) {
+                container.innerHTML = '<span class="empty-state">无默认过滤器</span>';
+                return;
+            }
+            container.innerHTML = '';
+            Object.entries(filters).forEach(([attr, value]) => {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <input type="text" value="${attr}" class="filter-attr" readonly style="max-width:80px;">
+                    <input type="text" value="${value}" class="filter-value">
+                    <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function addPredicate() {
+            const container = document.getElementById('predicateList');
+            if (container.querySelector('.empty-state')) container.innerHTML = '';
+            const item = document.createElement('div');
+            item.className = 'config-item';
+            item.innerHTML = `
+                <input type="text" class="pred-key" placeholder="名称" style="max-width:70px;">
+                <select class="pred-attr">
+                    ${getAllAttributes().map(a => `<option value="${a}">${a}</option>`).join('')}
+                </select>
+                <select class="pred-op" style="max-width:50px;">
+                    <option value=">">&gt;</option><option value=">=">&ge;</option>
+                    <option value="<">&lt;</option><option value="<=">&le;</option>
+                    <option value="==">=</option><option value="!=">&ne;</option>
+                </select>
+                <input type="text" class="pred-value" placeholder="值" style="max-width:60px;">
+                <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(item);
+        }
+
+        function addFilter() {
+            const container = document.getElementById('filterList');
+            if (container.querySelector('.empty-state')) container.innerHTML = '';
+            const item = document.createElement('div');
+            item.className = 'config-item';
+            item.innerHTML = `
+                <select class="filter-attr" style="max-width:80px;">
+                    ${getAllAttributes().map(a => `<option value="${a}">${a}</option>`).join('')}
+                </select>
+                <input type="text" class="filter-value" placeholder="属性值">
+                <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(item);
+        }
+
+        // Holder Credentials
+        async function loadHolderCredentials(vcType) {
+            const el = document.getElementById('holderInfo');
+            try {
+                const res = await fetch(`${API}/holder-credentials/${vcType}`);
+                const data = await res.json();
+                if (data.success && data.count > 0) {
+                    el.innerHTML = `<span class="holder-badge has-creds">${data.count} 个 ${vcType} 凭证</span>`;
+                } else {
+                    el.innerHTML = '<span class="holder-badge">暂无凭证</span>';
+                }
+            } catch (e) {
+                el.innerHTML = '<span class="holder-badge">加载失败</span>';
+            }
+        }
+
+        // Execute Verification
+        async function executeVerification() {
+            if (!currentVcHash || !currentUuid) {
+                showToast('error', '请先选择 VC 记录');
+                return;
+            }
+
+            // Collect predicates
+            const predicates = {};
+            document.querySelectorAll('#predicateList .config-item').forEach(item => {
+                const key = item.querySelector('.pred-key')?.value?.trim();
+                const attr = item.querySelector('.pred-attr')?.value;
+                const op = item.querySelector('.pred-op')?.value;
+                const val = item.querySelector('.pred-value')?.value;
+                if (key && attr && op && val) {
+                    predicates[key] = { attribute: attr, operator: op, value: isNaN(val) ? val : parseInt(val) };
+                }
+            });
+
+            // Collect filters
+            const attributeFilters = {};
+            document.querySelectorAll('#filterList .config-item').forEach(item => {
+                const attr = item.querySelector('.filter-attr')?.value;
+                const val = item.querySelector('.filter-value')?.value;
+                if (attr && val) attributeFilters[attr] = val;
+            });
+
+            // Show progress
+            const progressSection = document.getElementById('progressSection');
+            progressSection.style.display = 'block';
+            progressSection.innerHTML = `
+                <div class="section-card">
+                    <div class="progress-steps">
+                        <div class="progress-step">
+                            <div class="step-dot running">2</div>
+                            <span class="step-label">UUID 匹配验证</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-dot" id="step3Dot">3</div>
+                            <span class="step-label">完整验证</span>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.getElementById('resultSection').style.display = 'none';
+            progressSection.scrollIntoView({ behavior: 'smooth' });
+
+            try {
+                const res = await fetch(`${API}/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        vc_type: currentVcType,
+                        vc_hash: currentVcHash,
+                        uuid: currentUuid,
+                        predicates: Object.keys(predicates).length > 0 ? predicates : undefined,
+                        attribute_filters: Object.keys(attributeFilters).length > 0 ? attributeFilters : undefined
+                    })
+                });
+                const result = await res.json();
+
+                // Update progress
+                const steps = progressSection.querySelectorAll('.step-dot');
+                steps[0].className = 'step-dot ' + (result.step2_result?.verified ? 'completed' : 'failed');
+                steps[0].textContent = result.step2_result?.verified ? '✓' : '✗';
+                steps[1].className = 'step-dot ' + (result.step3_result?.verified ? 'completed' : 'failed');
+                steps[1].textContent = result.step3_result?.verified ? '✓' : '✗';
+
+                displayResult(result);
+            } catch (e) {
+                const steps = progressSection.querySelectorAll('.step-dot');
+                steps.forEach(s => { s.className = 'step-dot failed'; s.textContent = '✗'; });
+                displayResult({ success: false, error: e.message });
+            }
+        }
+
+        function displayResult(result) {
+            const section = document.getElementById('resultSection');
+            section.style.display = 'block';
+            let html = '';
+
+            // Overall status
+            if (result.success) {
+                html += '<div class="result-card"><div class="result-header success">✅ 验证成功</div></div>';
+            } else {
+                html += '<div class="result-card"><div class="result-header error">❌ 验证失败</div></div>';
+            }
+
+            // Step 2 result
+            if (result.step2_result) {
+                html += '<div class="result-card"><div class="result-header">步骤 2: UUID 匹配</div><div class="result-body">';
+                html += result.step2_result.verified
+                    ? '<div style="color:#10b981;">✓ UUID 匹配验证通过</div>'
+                    : '<div style="color:#ef4444;">✗ ' + (result.step2_result.error || '验证失败') + '</div>';
+                html += '</div></div>';
+            }
+
+            // Step 3 result
+            if (result.step3_result) {
+                html += '<div class="result-card"><div class="result-header">步骤 3: 完整验证</div><div class="result-body">';
+
+                // Revealed attributes
+                const revealed = result.step3_result.revealed_attributes || {};
+                if (Object.keys(revealed).length > 0) {
+                    html += '<div style="font-size:12px; color:#888; margin-bottom:4px;">披露的属性</div>';
+                    html += '<ul class="attr-list">';
+                    for (const [k, v] of Object.entries(revealed)) {
+                        html += `<li><span class="attr-key">${k}</span><span class="attr-val">${v}</span></li>`;
+                    }
+                    html += '</ul>';
+                }
+
+                // Predicate results
+                const preds = result.step3_result.predicate_results || {};
+                if (Object.keys(preds).length > 0) {
+                    html += '<div style="font-size:12px; color:#888; margin: 8px 0 4px;">谓词验证</div>';
+                    html += '<ul class="attr-list">';
+                    for (const [k, p] of Object.entries(preds)) {
+                        const cls = p.satisfied ? 'satisfied' : 'not-satisfied';
+                        const icon = p.satisfied ? '✓' : '✗';
+                        html += `<li><span class="attr-key">${k}: ${p.attribute} ${p.operator} ${p.value}</span><span class="${cls}">${icon}</span></li>`;
+                    }
+                    html += '</ul>';
+                }
+
+                // Restriction results
+                const restrictions = result.step3_result.restriction_results || {};
+                if (Object.keys(restrictions).length > 0) {
+                    html += '<div style="font-size:12px; color:#888; margin: 8px 0 4px;">限制条件</div>';
+                    html += '<ul class="attr-list">';
+                    for (const [k, r] of Object.entries(restrictions)) {
+                        const cls = r.satisfied ? 'satisfied' : 'not-satisfied';
+                        const icon = r.satisfied ? '✓' : '✗';
+                        html += `<li><span class="attr-key">${k}: ${r.attribute}=${r.expected_value}</span><span class="${cls}">${icon}</span></li>`;
+                    }
+                    html += '</ul>';
+                }
+
+                html += '</div></div>';
+            }
+
+            // Error
+            if (result.error) {
+                html += `<div class="result-card"><div class="result-header error">错误信息</div><div class="result-body">
+                    <div style="font-size:13px; color:#666; word-break:break-all;">${result.error}</div>
+                </div></div>`;
+            }
+
+            section.innerHTML = html;
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Helpers
+        function fmtTime(ts) {
+            if (!ts) return 'N/A';
+            return new Date(ts).toLocaleString('zh-CN', {
+                month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function showToast(type, msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

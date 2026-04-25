@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "created_at": "2026-01-05T18:31:56.040256",
+    "description": "VC凭证配置文件 - 包含Schema和Credential Definition信息",
+    "version": "1.0"
+  },
+  "issuer": {
+    "did": "DPvobytTtKvmyeRTJZYjsg",
+    "admin_url": "http://localhost:8080",
+    "endpoint": "http://localhost:8000"
+  },
+  "holder": {
+  "did": "YL2HDxkVL8qMrssaZbvtfH",
+    "admin_url": "http://localhost:8081",
+    "endpoint": "http://localhost:8001"
+  },
+   "verifier": {
+  "did": "TuCeZ4bsKsGgsNQLFPDKu4",
+    "admin_url": "http://localhost:8082",
+    "endpoint": "http://localhost:8002"
+  }, 
+  "von_network": {
+    "genesis_url": "http://localhost/genesis",
+    "network_name": "von-network"
+  },
+  "schemas": {
+    "schema1": {
+      "name": "InspectionReport",
+      "version": "1.0",
+      "attributes": [
+        "exporter",
+        "contractName",
+        "productName",
+        "productQuantity",
+        "productBatch",
+        "inspectionPassed",
+        "Date"
+      ],
+      "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:InspectionReport:2.0.0",
+      "cred_def_id": "DPvobytTtKvmyeRTJZYjsg:3:CL:62:InspectionReport_V9",
+      "tag": "InspectionReport_V9"
+    },
+    "schema2": {
+      "name": "InsuranceContract",
+      "version": "1.0",
+      "attributes": [
+        "exporter",
+        "importer",
+        "contractName",
+        "productName",
+        "productQuantity",
+        "productBatch",
+        "insuranceAmount",
+        "insuranceCompany",
+        "isInsured",
+        "Date"
+      ],
+      "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:InsuranceContract:1.0.0",
+      "cred_def_id": "DPvobytTtKvmyeRTJZYjsg:3:CL:64:InsuranceContract_V9",
+      "tag": "InsuranceContract_V9"
+    },
+    "schema3": {
+      "name": "CertificateOfOrigin",
+      "version": "1.0",
+      "attributes": [
+        "exporter",
+        "importer",
+        "certifier",
+        "contractName",
+        "productName",
+        "productQuantity",
+        "productBatch",
+        "placeOfOrigin",
+        "Date"
+      ],
+      "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:CertificateOfOrigin:1.0.0",
+      "cred_def_id": "DPvobytTtKvmyeRTJZYjsg:3:CL:66:CertificateOfOrigin_V9",
+      "tag": "CertificateOfOrigin_V9"
+    },
+    "schema4": {
+      "name": "BillOfLadingCertificate",
+      "version": "1.0",
+      "attributes": [
+        "exporter",
+        "shippingCompany",
+        "contractName",
+        "productName",
+        "productQuantity",
+        "productBatch",
+        "portOfDeparture",
+        "portOfArrival",
+        "departureDate",
+        "scheduledArrivalDate"
+      ],
+      "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:BillOfLadingCertificate:1.0.0",
+      "cred_def_id": "DPvobytTtKvmyeRTJZYjsg:3:CL:68:BillOfLadingCertificate_V9",
+      "tag": "BillOfLadingCertificate_V9"
+    }
+  },
+  "summary": {
+    "total_schemas": 4,
+    "successful_schemas": 4,
+    "failed_schemas": 0,
+    "successful_cred_defs": 4,
+    "failed_cred_defs": 0
+  }
+}

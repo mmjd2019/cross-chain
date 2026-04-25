@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Environment & secrets
+.env
+*.key
+*.pem
+
+# Solidity compile output (regenerate from .sol sources)
+contracts/kept/build/
+
+# Runtime state files
+vc_transfer_oracle_state.json
+uuid.json
+results.json
+
+# Deployment results (environment-specific)
+contracts/kept/deployment_results/
+contracts/kept/contract_state/
+
+# Claude Code internal
+.claude/
+
+# Docker
+docker-compose.override.yml
+
+# Config with sensitive keys (keep templates, ignore live configs)
+config/address.json
+config/cross_chain_oracle_config.json
+config/blockchain_config.json
+config/did_address_map.json
+config/funding_result.json
+config/did_registration_result.json
+config/vc_bridge_config_result.json
+VcIssureOracle/vc_issuance_config.json
+oracle/vp_predicate_config.json
+oracle/vp_oracle_config.json

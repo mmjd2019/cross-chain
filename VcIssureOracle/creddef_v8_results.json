@@ -1,0 +1,18 @@
+{
+  "InspectionReport": {
+    "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:InspectionReport:2.0.0",
+    "cred_def_id": null
+  },
+  "InsuranceContract": {
+    "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:InsuranceContract:1.0.0",
+    "cred_def_id": null
+  },
+  "CertificateOfOrigin": {
+    "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:CertificateOfOrigin:1.0.0",
+    "cred_def_id": null
+  },
+  "BillOfLadingCertificate": {
+    "schema_id": "DPvobytTtKvmyeRTJZYjsg:2:BillOfLadingCertificate:1.0.0",
+    "cred_def_id": null
+  }
+}
